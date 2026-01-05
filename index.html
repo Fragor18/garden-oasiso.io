@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Зеленый Оазис — Лидерборд и Режимы</title>
+    <title>Зеленый Оазис — Pro Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800&family=Ubuntu:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root { 
@@ -16,7 +16,6 @@
             margin: 0; padding: 0; height: 100%; width: 100%; 
             font-family: 'Ubuntu', sans-serif; 
             background-color: #0a1a0a; overflow: hidden;
-            touch-action: manipulation;
         }
 
         .main-bg {
@@ -26,120 +25,122 @@
             background-size: cover; background-position: center;
         }
 
-        /* Экраны */
+        /* Авторизация и Выбор */
         #authLayer, #deviceLayer { 
             position: fixed; inset: 0; z-index: 2000; 
             background: rgba(0,0,0,0.98); 
             display: flex; flex-direction: column;
             justify-content: center; align-items: center; padding: 20px; 
         }
-
         .card { background: white; color: #333; padding: 30px; border-radius: 30px; width: 100%; max-width: 350px; text-align: center; border: 4px solid var(--primary); }
         .auth-input { width: 100%; padding: 15px; margin: 10px 0; border-radius: 15px; border: 2px solid #ddd; font-size: 1rem; }
 
-        .layer { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 10; padding-top: 80px; padding-bottom: 100px; }
+        .layer { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; z-index: 10; padding-top: 110px; padding-bottom: 100px; }
         .hidden { display: none !important; }
 
-        /* Кнопки */
-        .btn { padding: 15px 25px; border-radius: 50px; border: none; font-weight: bold; cursor: pointer; font-family: 'Ubuntu'; text-transform: uppercase; font-size: 0.8rem; transition: 0.2s; }
+        .btn { padding: 12px 20px; border-radius: 50px; border: none; font-weight: bold; cursor: pointer; font-family: 'Ubuntu'; text-transform: uppercase; font-size: 0.8rem; }
         .btn-green { background: var(--primary); color: white; }
 
-        /* Хедер */
         .site-header { position: absolute; top: 0; width: 100%; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; z-index: 100; background: rgba(0,0,0,0.9); border-bottom: 2px solid var(--primary); }
-        .site-title { font-family: 'Montserrat'; color: var(--accent); }
 
-        /* --- РАЗНИЦА ПК И ТЕЛЕФОН --- */
+        /* Контейнер Сада с прокруткой */
+        .garden-container {
+            width: 100%;
+            height: 100%;
+            overflow-y: auto;
+            display: flex;
+            justify-content: center;
+            padding: 10px;
+        }
+
+        /* Сетки */
+        .garden-grid { display: grid; gap: 10px; height: max-content; }
+        .is-pc .garden-grid { grid-template-columns: repeat(4, 160px); }
+        .is-mobile .garden-grid { grid-template-columns: repeat(2, 1fr); width: 100%; max-width: 360px; }
+
+        .garden-slot { aspect-ratio: 4/5; background: rgba(255,255,255,0.1); border: 2px dashed rgba(255,255,255,0.3); border-radius: 20px; display: flex; align-items: center; justify-content: center; cursor: pointer; overflow: hidden; }
         
-        /* Сетка для ПК */
-        .is-pc .garden-grid { 
-            display: grid; 
-            grid-template-columns: repeat(4, 180px); 
-            gap: 20px; 
-        }
-        .is-pc .garden-slot { height: 220px; border-radius: 25px; }
+        /* Карточка растения и плотные полоски */
+        .plant-card { width: 100%; height: 100%; background: var(--card-bg); color: #333; padding: 10px; display: flex; flex-direction: column; align-items: center; }
+        .plant-icon { font-size: 2.5rem; flex-grow: 1; display: flex; align-items: center; }
+        
+        .bars-container { width: 100%; display: flex; flex-direction: column; gap: 0px; border-radius: 6px; overflow: hidden; border: 1px solid #ccc; }
+        .bar { width: 100%; height: 8px; background: #eee; position: relative; }
+        .fill { height: 100%; transition: 0.3s; width: 0%; }
 
-        /* Сетка для Телефона */
-        .is-mobile .garden-grid { 
-            display: grid; 
-            grid-template-columns: repeat(2, 1fr); 
-            gap: 10px; 
-            width: 95%;
-            max-width: 400px;
-        }
-        .is-mobile .garden-slot { aspect-ratio: 4/5; border-radius: 15px; }
-
-        .garden-slot { background: rgba(255,255,255,0.1); border: 2px dashed rgba(255,255,255,0.3); display: flex; align-items: center; justify-content: center; cursor: pointer; }
-        .plant-card { width: 100%; height: 100%; background: var(--card-bg); color: #333; border-radius: inherit; padding: 10px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; }
-        .bar { width: 100%; height: 6px; background: #ddd; border-radius: 10px; overflow: hidden; }
-        .fill { height: 100%; transition: 0.5s; }
-
-        /* Хотбар */
-        .hotbar { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 15px; background: rgba(0,0,0,0.9); padding: 12px 25px; border-radius: 40px; z-index: 500; }
-        .tool { width: 55px; height: 55px; background: #222; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; cursor: pointer; }
-        .tool.active { border: 2px solid var(--accent); box-shadow: 0 0 10px var(--accent); }
+        /* Хотбар и КД */
+        .hotbar { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 15px; background: rgba(0,0,0,0.92); padding: 12px 20px; border-radius: 35px; border: 1px solid var(--primary); z-index: 500; }
+        .tool { width: 55px; height: 55px; background: #222; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; cursor: pointer; position: relative; overflow: hidden; }
+        .tool.active { background: #333; border: 2px solid var(--accent); }
+        .cooldown-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); transform: translateY(100%); transition: transform linear; }
 
         /* Модалки */
         .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 1500; display: flex; justify-content: center; align-items: center; opacity: 0; visibility: hidden; padding: 20px; }
         .overlay.active { opacity: 1; visibility: visible; }
-        .modal { background: white; color: #333; width: 100%; max-width: 400px; padding: 25px; border-radius: 30px; text-align: center; max-height: 80vh; overflow-y: auto; }
-        
-        /* Таблица лидеров */
-        .leader-row { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #eee; font-weight: bold; }
-        .item-row { display: flex; justify-content: space-between; align-items: center; padding: 12px; background: #f4f9f4; margin: 8px 0; border-radius: 15px; cursor: pointer; }
+        .modal { background: white; color: #333; width: 100%; max-width: 380px; padding: 20px; border-radius: 25px; text-align: center; max-height: 80vh; overflow-y: auto; }
+        .item-row { display: flex; justify-content: space-between; align-items: center; padding: 12px; background: #f0f7f0; margin: 8px 0; border-radius: 12px; cursor: pointer; border: 1px solid #ddd; }
 
-        .cheat-btn { position: fixed; bottom: 10px; left: 10px; width: 30px; height: 30px; background: rgba(0,0,0,0.3); color: #555; border: none; border-radius: 5px; z-index: 1000; cursor: pointer; }
+        .cheat-btn { position: fixed; bottom: 5px; right: 5px; opacity: 0.3; background: none; color: gray; border: none; font-family: monospace; cursor: pointer; }
     </style>
 </head>
-<body>
+<body class="is-pc">
     <div class="main-bg"></div>
-    <button class="cheat-btn" onclick="openCheatConsole()">\</button>
+    <button class="cheat-btn" onclick="let c=prompt('Код:'); if(c=='money') gameData.score+=50000; save();">\</button>
 
     <div id="authLayer">
         <div class="card">
-            <h1 style="color: var(--primary); margin: 0; font-family: 'Montserrat';">OASIS</h1>
-            <p>Добро пожаловать!</p>
+            <h1 style="color:var(--primary); font-family:Montserrat; margin:0">OASIS</h1>
             <input type="text" id="nameInput" class="auth-input" placeholder="Никнейм">
             <input type="password" id="passInput" class="auth-input" placeholder="Пароль">
-            <button class="btn btn-green" style="width: 100%; margin-top: 10px;" onclick="handleAuth()">ВОЙТИ</button>
+            <button class="btn btn-green" style="width:100%" onclick="handleAuth()">Войти</button>
         </div>
     </div>
 
     <div id="deviceLayer" class="hidden">
         <div class="card">
-            <h2 style="color: var(--primary);">Режим экрана</h2>
-            <button class="btn btn-green" style="width:100%; margin-bottom: 10px;" onclick="setDevice('pc')">💻 КОМПЬЮТЕР</button>
-            <button class="btn btn-green" style="width:100%;" onclick="setDevice('mobile')">📱 ТЕЛЕФОН</button>
+            <h3>Выбери интерфейс:</h3>
+            <button class="btn btn-green" style="width:100%; margin-bottom:10px" onclick="setDevice('pc')">Компьютер 💻</button>
+            <button class="btn btn-green" style="width:100%" onclick="setDevice('mobile')">Телефон 📱</button>
         </div>
     </div>
 
     <div id="gameUI" class="hidden">
         <header class="site-header">
-            <div class="site-title">OASIS</div>
-            <div style="display: flex; align-items: center; gap: 15px;">
-                <span id="scoreDisplay" style="font-size:1.1rem; color:var(--accent); font-weight:bold;">💰 0</span>
-                <button onclick="location.reload()" style="background:none; border:none; font-size:1.2rem; cursor:pointer;">🚪</button>
+            <div style="color:var(--accent); font-weight:bold; font-family:Montserrat">OASIS</div>
+            <div style="display:flex; align-items:center; gap:15px">
+                <span id="scoreDisplay" style="color:white; font-weight:bold">💰 0</span>
+                <button onclick="location.reload()" style="background:none; border:none; color:white; font-size:1.2rem">🚪</button>
             </div>
         </header>
 
-        <nav style="position: absolute; top: 65px; display: flex; justify-content: center; width: 100%; gap: 10px; z-index: 100;">
+        <nav style="position: absolute; top: 60px; display: flex; gap: 8px; z-index: 100;">
             <button class="btn btn-green" onclick="showPage('mainPage')">Академия</button>
             <button class="btn btn-green" onclick="showPage('gardenPage')">Мой Сад</button>
         </nav>
 
         <div id="mainPage" class="layer">
-            <h1 style="color:var(--light-green); text-shadow: 0 0 10px #000;">АКАДЕМИЯ</h1>
-            <div style="display: flex; gap: 10px;">
-                <button class="btn btn-green" onclick="openCatalog()">КАТАЛОГ</button>
-                <button class="btn btn-green" style="background:#f39c12" onclick="openLeaderboard()">🏆 ЛИДЕРЫ</button>
+            <h1 style="color:var(--light-green); text-align:center">АКАДЕМИЯ</h1>
+            <div style="display:flex; flex-direction:column; gap:10px; width:200px">
+                <button class="btn btn-green" onclick="openCatalog()">📚 Каталог</button>
+                <button class="btn btn-green" style="background:#f39c12" onclick="openLeaderboard()">🏆 Лидеры</button>
             </div>
         </div>
 
         <div id="gardenPage" class="layer hidden">
-            <div class="garden-grid" id="gardenGrid"></div>
+            <div class="garden-container">
+                <div class="garden-grid" id="gardenGrid"></div>
+            </div>
+            
             <div class="hotbar">
-                <div class="tool active" id="t-water" onclick="setTool('water')">💧</div>
-                <div class="tool" id="t-food" onclick="setTool('food')">🧪</div>
-                <div class="tool" id="t-trash" onclick="setTool('trash')">🗑️</div>
+                <div class="tool active" id="t-water" onclick="setTool('water')">
+                    💧 <div id="cd-water" class="cooldown-overlay"></div>
+                </div>
+                <div class="tool" id="t-food" onclick="setTool('food')">
+                    🧪 <div id="cd-food" class="cooldown-overlay"></div>
+                </div>
+                <div class="tool" id="t-trash" onclick="setTool('trash')">
+                    🗑️
+                </div>
             </div>
         </div>
     </div>
@@ -148,31 +149,29 @@
 
     <script>
         const plants = [
-            { id: 0, name: 'Монстера', icon: '🌿', price: 2, testCost: 0, info: 'Лиана из джунглей.', q: [{q:'Тип?', o:['Дерево','Лиана'], a:1}] },
-            { id: 1, name: 'Кактус', icon: '🌵', price: 15, testCost: 500, info: 'Хранит воду в стебле.', q: [{q:'Где вода?', o:['Стебель','Колючки'], a:0}] },
-            { id: 2, name: 'Мухоловка', icon: '🪴', price: 65, testCost: 2500, info: 'Ловит насекомых.', q: [{q:'Что ест?', o:['Мух','Траву'], a:0}] },
-            { id: 3, name: 'Бамбук', icon: '🎋', price: 220, testCost: 9000, info: 'Самая быстрая трава.', q: [{q:'Это?', o:['Трава','Куст'], a:0}] },
-            { id: 4, name: 'Оазис', icon: '💎', price: 3500, testCost: 60000, info: 'Легенда сада.', q: [{q:'Финал?', o:['Да','Нет'], a:0}] }
+            { id: 0, name: 'Монстера', icon: '🌿', price: 2, testCost: 0 },
+            { id: 1, name: 'Кактус', icon: '🌵', price: 15, testCost: 500 },
+            { id: 2, name: 'Мухоловка', icon: '🪴', price: 70, testCost: 3000 },
+            { id: 3, name: 'Бамбук', icon: '🎋', price: 250, testCost: 10000 },
+            { id: 4, name: 'Оазис', icon: '💎', price: 4000, testCost: 70000 }
         ];
 
         let currentUser = null;
-        let gameData = { score: 0, unlocked: [0], garden: new Array(8).fill(null) };
-        let currentTool = 'water', testStep = 0;
-        const DB_KEY = 'oasis_final_v12';
+        let gameData = { score: 0, unlocked: [0], garden: new Array(12).fill(null) };
+        let currentTool = 'water';
+        let cooldowns = { water: false, food: false };
 
         function handleAuth() {
             const name = document.getElementById('nameInput').value.trim();
             const pass = document.getElementById('passInput').value.trim();
-            if(!name || !pass) return alert("Заполни поля!");
-            
-            let users = JSON.parse(localStorage.getItem(DB_KEY) || '{}');
+            if(!name || !pass) return;
+            let users = JSON.parse(localStorage.getItem('oasis_v15') || '{}');
             if(users[name]) {
                 if(users[name].pass !== pass) return alert("Пароль!");
                 gameData = users[name].data;
             } else {
-                users[name] = { pass, data: { score: 0, unlocked: [0], garden: new Array(8).fill(null) } };
-                localStorage.setItem(DB_KEY, JSON.stringify(users));
-                gameData = users[name].data;
+                users[name] = { pass, data: gameData };
+                localStorage.setItem('oasis_v15', JSON.stringify(users));
             }
             currentUser = name;
             document.getElementById('authLayer').classList.add('hidden');
@@ -186,75 +185,22 @@
             renderGarden();
         }
 
-        function save() {
-            if(!currentUser) return;
-            let users = JSON.parse(localStorage.getItem(DB_KEY) || '{}');
-            users[currentUser].data = gameData;
-            localStorage.setItem(DB_KEY, JSON.stringify(users));
-        }
-
-        function openCatalog() {
-            let h = '<h3>Академия Оазиса</h3>';
-            plants.forEach((p, i) => {
-                const isU = gameData.unlocked.includes(i);
-                const prevU = (i === 0) || gameData.unlocked.includes(i - 1);
-                if (prevU) {
-                    h += `<div class="item-row" onclick="showPlantInfo(${i})">
-                        <span>${p.icon} ${p.name}</span>
-                        <span>${isU ? '✅' : '💰'+p.testCost}</span>
-                    </div>`;
-                } else {
-                    h += `<div class="item-row" style="opacity:0.5; cursor:not-allowed;"><span>🔒 Заблокировано</span></div>`;
-                }
-            });
-            document.getElementById('modalContent').innerHTML = h + `<button class="btn btn-green" style="width:100%" onclick="closeM()">Назад</button>`;
-            document.getElementById('modalOverlay').classList.add('active');
-        }
-
-        function showPlantInfo(idx) {
-            const p = plants[idx];
-            let h = `<h3>${p.name}</h3><div style="background:#eee; padding:10px; border-radius:10px; margin-bottom:10px">${p.info}</div>`;
-            if(gameData.unlocked.includes(idx)) h += `<p>Уже изучено!</p>`;
-            else h += `<button class="btn btn-green" onclick="startTest(${idx})">Пройти тест (💰${p.testCost})</button>`;
-            document.getElementById('modalContent').innerHTML = h + `<br><br><button class="btn" onclick="openCatalog()">Назад</button>`;
-        }
-
-        function startTest(idx) {
-            if(gameData.score < plants[idx].testCost) return alert("Мало монет!");
-            gameData.score -= plants[idx].testCost; testStep = 0; renderQuiz(idx);
-        }
-
-        function renderQuiz(idx) {
-            const q = plants[idx].q[testStep];
-            let opts = q.o.map((txt, i) => `<button class="item-row" style="width:100%" onclick="ansQuiz(${idx}, ${i})">${txt}</button>`).join('');
-            document.getElementById('modalContent').innerHTML = `<h3>Вопрос</h3><p>${q.q}</p>${opts}`;
-        }
-
-        function ansQuiz(idx, ans) {
-            if(ans === plants[idx].q[testStep].a) {
-                gameData.unlocked.push(idx);
-                alert("Растение открыто!");
-            } else alert("Ошибка!");
-            save(); openCatalog();
-        }
-
-        function openLeaderboard() {
-            let users = JSON.parse(localStorage.getItem(DB_KEY) || '{}');
-            let list = Object.keys(users).map(name => ({ name, score: Math.floor(users[name].data.score) }));
-            list.sort((a, b) => b.score - a.score);
-
-            let h = '<h3>🏆 Таблица Лидеров</h3>';
-            list.slice(0, 10).forEach((u, i) => {
-                h += `<div class="leader-row"><span>${i+1}. ${u.name}</span><span>💰 ${u.score}</span></div>`;
-            });
-            document.getElementById('modalContent').innerHTML = h + `<br><button class="btn btn-green" onclick="closeM()">Закрыть</button>`;
-            document.getElementById('modalOverlay').classList.add('active');
-        }
-
         function setTool(t) {
             currentTool = t;
             document.querySelectorAll('.tool').forEach(el => el.classList.remove('active'));
             document.getElementById('t-'+t).classList.add('active');
+        }
+
+        function triggerCooldown(tool, ms) {
+            cooldowns[tool] = true;
+            const overlay = document.getElementById('cd-' + tool);
+            overlay.style.transition = 'none';
+            overlay.style.transform = 'translateY(0%)';
+            setTimeout(() => {
+                overlay.style.transition = `transform ${ms}ms linear`;
+                overlay.style.transform = 'translateY(100%)';
+            }, 10);
+            setTimeout(() => { cooldowns[tool] = false; }, ms);
         }
 
         function handleSlot(i) {
@@ -263,12 +209,18 @@
                 plants.filter((_, idx) => gameData.unlocked.includes(idx)).forEach(p => {
                     h += `<div class="item-row" onclick="plantNow(${i}, ${p.id})">${p.icon} ${p.name}</div>`;
                 });
-                document.getElementById('modalContent').innerHTML = h + `<button class="btn" onclick="closeM()">Отмена</button>`;
+                document.getElementById('modalContent').innerHTML = h + `<button class="btn" onclick="closeM()">Закрыть</button>`;
                 document.getElementById('modalOverlay').classList.add('active');
             } else {
                 let p = gameData.garden[i];
-                if(currentTool === 'water') p.w = Math.min(p.w + 35, 100);
-                if(currentTool === 'food') p.h = Math.min(p.h + 25, 100);
+                if(currentTool === 'water' && !cooldowns.water) {
+                    p.w = Math.min(p.w + 40, 100);
+                    triggerCooldown('water', 1500); // 1.5 секунды КД
+                }
+                if(currentTool === 'food' && !cooldowns.food) {
+                    p.h = Math.min(p.h + 30, 100);
+                    triggerCooldown('food', 3000); // 3 секунды КД
+                }
                 if(currentTool === 'trash') gameData.garden[i] = null;
                 save(); renderGarden();
             }
@@ -284,20 +236,53 @@
                     const info = plants.find(x => x.id === p.id);
                     g.innerHTML += `<div class="garden-slot" onclick="handleSlot(${i})">
                         <div class="plant-card">
-                            <span style="font-size:2.5rem;">${info.icon}</span>
-                            <div class="bar"><div class="fill" style="width:${p.w}%; background:#2196f3"></div></div>
-                            <div class="bar"><div class="fill" style="width:${p.h}%; background:#4caf50"></div></div>
+                            <div class="plant-icon">${info.icon}</div>
+                            <div class="bars-container">
+                                <div class="bar"><div class="fill" style="width:${p.w}%; background:#2196f3"></div></div>
+                                <div class="bar"><div class="fill" style="width:${p.h}%; background:#4caf50"></div></div>
+                            </div>
                         </div>
                     </div>`;
                 }
             });
         }
 
-        function openCheatConsole() {
-            let code = prompt("Чит:");
-            if(code === 'money') gameData.score += 100000;
-            if(code === 'unlock') gameData.unlocked = [0,1,2,3,4];
-            save(); renderGarden();
+        function openCatalog() {
+            let h = '<h3>Магазин Знаний</h3>';
+            plants.forEach((p, i) => {
+                const isU = gameData.unlocked.includes(i);
+                const prevU = (i === 0) || gameData.unlocked.includes(i - 1);
+                h += `<div class="item-row ${!prevU ? 'hidden' : ''}" onclick="${isU ? '' : 'unlockP('+i+')'}">
+                    <span>${p.icon} ${p.name}</span>
+                    <span>${isU ? '✅' : '💰'+p.testCost}</span>
+                </div>`;
+            });
+            document.getElementById('modalContent').innerHTML = h + `<button class="btn" onclick="closeM()">Назад</button>`;
+            document.getElementById('modalOverlay').classList.add('active');
+        }
+
+        function unlockP(idx) {
+            if(gameData.score >= plants[idx].testCost) {
+                gameData.score -= plants[idx].testCost;
+                gameData.unlocked.push(idx);
+                save(); openCatalog();
+            } else alert("Мало монет!");
+        }
+
+        function openLeaderboard() {
+            let users = JSON.parse(localStorage.getItem('oasis_v15') || '{}');
+            let list = Object.keys(users).map(n => ({ n, s: Math.floor(users[n].data.score) })).sort((a,b)=>b.s-a.s);
+            let h = '<h3>Лидеры</h3>';
+            list.forEach((u,i) => h += `<div class="item-row"><span>${i+1}. ${u.n}</span><span>💰 ${u.s}</span></div>`);
+            document.getElementById('modalContent').innerHTML = h + `<button class="btn" onclick="closeM()">Закрыть</button>`;
+            document.getElementById('modalOverlay').classList.add('active');
+        }
+
+        function save() {
+            if(!currentUser) return;
+            let users = JSON.parse(localStorage.getItem('oasis_v15') || '{}');
+            users[currentUser].data = gameData;
+            localStorage.setItem('oasis_v15', JSON.stringify(users));
         }
 
         function closeM() { document.getElementById('modalOverlay').classList.remove('active'); }
@@ -312,7 +297,7 @@
             gameData.garden.forEach(p => {
                 if(p) {
                     p.w = Math.max(p.w - 0.5, 0); 
-                    if(p.w < 20) p.h = Math.max(p.h - 0.7, 0); 
+                    if(p.w < 25) p.h = Math.max(p.h - 0.8, 0); 
                     if(p.h > 40) gameData.score += plants.find(x => x.id === p.id).price / 20;
                 }
             });
@@ -322,4 +307,3 @@
     </script>
 </body>
 </html>
-
