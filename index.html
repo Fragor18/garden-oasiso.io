@@ -3,103 +3,87 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Зеленый Оазис — Легенда Академии</title>
+    <title>Зеленый Оазис — Чит-панель</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800&family=Ubuntu:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #2e7d32; --bg: #050a05; --accent: #4caf50; --light-green: #98ff98; --card-bg: rgba(255,255,255,0.95); }
+        :root { 
+            --primary: #2e7d32; --bg: #050a05; --accent: #4caf50; 
+            --light-green: #98ff98; --card-bg: rgba(255,255,255,0.95);
+            --base-font: 16px; 
+        }
         * { box-sizing: border-box; outline: none; }
         
         body, html { 
             margin: 0; padding: 0; height: 100%; width: 100%; 
             font-family: 'Ubuntu', sans-serif; 
-            background-color: #0a1a0a;
-            overflow: hidden; 
+            background-color: #0a1a0a; overflow: hidden;
+            font-size: var(--base-font); 
         }
 
-        /* ГЛАВНЫЙ ФОН */
         .main-bg {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            z-index: -1;
+            position: fixed; inset: 0; z-index: -1;
             background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.7)), 
                               url('https://images.pexels.com/photos/1072179/pexels-photo-1072179.jpeg?auto=compress&cs=tinysrgb&w=1920');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
+            background-size: cover; background-position: center; background-repeat: no-repeat;
         }
 
         .site-header { position: absolute; top: 0; width: 100%; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; z-index: 100; background: rgba(0,0,0,0.8); backdrop-filter: blur(15px); border-bottom: 2px solid var(--primary); }
-        .site-title { font-family: 'Montserrat'; font-size: 1.8rem; color: var(--accent); }
+        .site-title { font-family: 'Montserrat'; font-size: 1.5rem; color: var(--accent); }
         
         #authLayer { position: fixed; inset: 0; z-index: 2000; background: #000; display: flex; justify-content: center; align-items: center; }
         .auth-card { background: white; color: #333; padding: 40px; border-radius: 40px; width: 400px; text-align: center; border: 4px solid var(--primary); }
-        .auth-input { width: 100%; padding: 15px; margin: 10px 0; border-radius: 15px; border: 2px solid #ddd; }
+        .auth-input { width: 100%; padding: 15px; margin: 10px 0; border-radius: 15px; border: 2px solid #ddd; font-size: 1rem; }
 
         .layer { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 10; padding-top: 80px; }
         .hidden { display: none !important; }
 
-        /* САДОВАЯ СЕТКА */
         .garden-grid { display: grid; grid-template-columns: repeat(4, 160px); gap: 15px; }
         .garden-slot { width: 160px; height: 190px; background: rgba(255,255,255,0.1); border: 2px dashed rgba(255,255,255,0.3); border-radius: 25px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; }
-        .garden-slot:hover { background: rgba(255,255,255,0.2); transform: scale(1.02); }
         
         .plant-card { width: 100%; height: 100%; background: var(--card-bg); color: #333; border-radius: 22px; padding: 12px; display: flex; flex-direction: column; align-items: center; box-shadow: 0 8px 15px rgba(0,0,0,0.5); }
         .bar { width: 100%; height: 8px; background: #ddd; border-radius: 10px; margin: 4px 0; overflow: hidden; }
         .fill { height: 100%; transition: 0.5s; }
 
-        /* КНОПКИ */
-        .btn { padding: 12px 25px; border-radius: 50px; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; font-family: 'Ubuntu'; text-transform: uppercase; }
+        .btn { padding: 12px 25px; border-radius: 50px; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; font-family: 'Ubuntu'; text-transform: uppercase; font-size: 0.9rem; }
         .btn-green { background: var(--primary); color: white; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-        .btn-green:hover { transform: translateY(-3px); filter: brightness(1.1); }
-        .btn-locked { background: #333 !important; color: #666 !important; cursor: not-allowed !important; opacity: 0.6; }
 
-        /* ХОТБАР */
         .hotbar { position: absolute; bottom: 30px; display: flex; gap: 15px; background: rgba(0,0,0,0.85); padding: 15px; border-radius: 30px; border: 1px solid #444; }
         .tool { width: 60px; height: 60px; background: #222; border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; cursor: pointer; position: relative; overflow: hidden; }
         .tool.active { border: 2px solid var(--accent); box-shadow: 0 0 15px var(--accent); }
         .cd-overlay { position: absolute; bottom: 0; left: 0; width: 100%; height: 0%; background: rgba(0,0,0,0.7); pointer-events: none; }
 
-        /* МОДАЛЬНЫЕ ОКНА */
         .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 1000; display: flex; justify-content: center; align-items: center; opacity: 0; visibility: hidden; transition: 0.3s; }
         .overlay.active { opacity: 1; visibility: visible; }
         .modal { background: white; color: #333; width: 90%; max-width: 500px; padding: 30px; border-radius: 35px; text-align: center; max-height: 85vh; overflow-y: auto; }
         
         .item-row { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: #f4f9f4; margin: 8px 0; border-radius: 20px; cursor: pointer; border: 1px solid #eee; }
-        .item-row.locked { background: #f0f0f0; cursor: not-allowed; color: #999; border: 1px dashed #ccc; }
-        .theory-box { background: #e8f5e9; padding: 15px; border-radius: 15px; text-align: left; margin: 15px 0; border-left: 5px solid var(--primary); font-size: 0.95rem; }
-        .quiz-opt { width: 100%; padding: 12px; margin: 6px 0; border: 2px solid #eee; border-radius: 12px; cursor: pointer; font-weight: bold; }
+        .theory-box { background: #e8f5e9; padding: 15px; border-radius: 15px; text-align: left; margin: 15px 0; border-left: 5px solid var(--primary); font-size: 1em; }
+        .quiz-opt { width: 100%; padding: 12px; margin: 6px 0; border: 2px solid #eee; border-radius: 12px; cursor: pointer; font-weight: bold; font-size: 1em; }
 
-        /* СТИЛИЗАЦИЯ ТЕКСТА ГЛАВНОЙ СТРАНИЦЫ */
-        .home-title { 
-            font-size: 4rem; 
-            color: var(--light-green); 
-            text-shadow: 0 0 20px rgba(152, 255, 152, 0.6), 2px 4px 10px rgba(0,0,0,0.8); 
-            margin-bottom: 10px;
-            font-family: 'Montserrat';
+        .home-title { font-size: 3.5rem; color: var(--light-green); text-shadow: 0 0 20px rgba(152, 255, 152, 0.6); margin-bottom: 10px; font-family: 'Montserrat'; text-align: center; }
+        .home-desc { font-size: 1.2rem; color: var(--light-green); text-align: center; max-width: 600px; font-weight: bold; }
+
+        /* Кнопка Читов */
+        .cheat-btn {
+            position: fixed; bottom: 10px; left: 10px;
+            width: 30px; height: 30px; background: rgba(0,0,0,0.5);
+            color: #555; border: none; border-radius: 5px;
+            cursor: pointer; font-family: monospace; z-index: 3000;
         }
-        .home-desc { 
-            font-size: 1.3rem; 
-            color: var(--light-green); 
-            text-align: center; 
-            max-width: 600px; 
-            text-shadow: 1px 1px 8px rgba(0,0,0,0.9);
-            font-weight: bold;
-            opacity: 0.9;
-        }
+        .cheat-btn:hover { color: var(--light-green); background: #000; }
     </style>
 </head>
 <body>
-
     <div class="main-bg"></div>
+
+    <button class="cheat-btn" onclick="openCheatConsole()">\</button>
 
     <div id="authLayer">
         <div class="auth-card">
-            <h1 style="color: var(--primary); margin: 0;">OASIS</h1>
-            <p style="color: #666; margin-bottom: 20px;">Вход в Оазис</p>
+            <h1>OASIS</h1>
             <input type="text" id="nameInput" class="auth-input" placeholder="Никнейм">
             <input type="password" id="passInput" class="auth-input" placeholder="Пароль">
-            <button class="btn btn-green" style="width: 100%; padding: 15px;" onclick="handleAuth()">НАЧАТЬ</button>
+            <button class="btn btn-green" style="width: 100%;" onclick="handleAuth()">ВОЙТИ</button>
         </div>
     </div>
 
@@ -108,23 +92,20 @@
             <div class="site-title">ЗЕЛЕНЫЙ ОАЗИС</div>
             <div style="display: flex; align-items: center; gap: 15px;">
                 <span id="scoreDisplay" style="font-size:1.4rem; color:var(--accent); font-weight:bold;">💰 0</span>
-                <span id="userLabel" style="font-weight: bold;"></span>
-                <button onclick="location.reload()" style="color:#ff5252; background:none; border:none; cursor:pointer; font-weight:bold;">ВЫХОД</button>
+                <button onclick="openSettings()" style="background:none; border:none; font-size:1.5rem; cursor:pointer;">⚙️</button>
+                <button onclick="location.reload()" style="color:#ff5252; background:none; border:none; cursor:pointer;">ВЫХОД</button>
             </div>
         </header>
 
-        <nav style="position: absolute; top: 90px; display: flex; gap: 12px; z-index: 100">
+        <nav style="position: absolute; top: 85px; display: flex; gap: 10px; z-index: 100; left: 20px;">
             <button class="btn btn-green" onclick="showPage('mainPage')">Академия</button>
-            <button class="btn btn-green" onclick="showPage('gardenPage')">Мой Сад</button>
-            <button class="btn" style="background: #ffd700; color: #333;" onclick="openLeaderboard()">🏆 Топ</button>
+            <button class="btn btn-green" onclick="showPage('gardenPage')">Сад</button>
         </nav>
 
         <div id="mainPage" class="layer">
             <h1 class="home-title">АКАДЕМИЯ</h1>
-            <p class="home-desc">
-                Изучай природу, сдавай экзамены и открывай легендарные семена. <br> Каждое знание приближает тебя к Дереву Жизни!
-            </p>
-            <button class="btn btn-green" style="padding: 22px 70px; font-size: 1.3rem; margin-top: 25px;" onclick="openCatalog()">КАТАЛОГ ЗНАНИЙ</button>
+            <p class="home-desc">Изучай растения и создай свой рай!</p>
+            <button class="btn btn-green" onclick="openCatalog()">КАТАЛОГ</button>
         </div>
 
         <div id="gardenPage" class="layer hidden">
@@ -141,62 +122,31 @@
 
     <script>
         const plants = [
-            { id: 0, name: 'Монстера', icon: '🌿', price: 2, testCost: 0, info: 'Тропическая лиана. Дырки в листьях помогают ей выживать во время сильных ливней и ветров.', questions: [
-                {q: 'К какому типу относится Монстера?', o: ['Дерево', 'Лиана', 'Трава'], a: 1},
-                {q: 'Зачем ей дырки в листьях?', o: ['Пропускать ветер', 'Для красоты', 'Чтобы больше пить'], a: 0},
-                {q: 'Что она любит?', o: ['Прямое солнце', 'Тень и влагу', 'Холод'], a: 1},
-                {q: 'Как она ползет вверх?', o: ['Шипами', 'Воздушными корнями', 'Усами'], a: 1},
-                {q: 'Монстера ядовита?', o: ['Да (сок)', 'Нет', 'Только плоды'], a: 0}
-            ]},
-            { id: 1, name: 'Кактус', icon: '🌵', price: 12, testCost: 150, info: 'Растение пустынь. Иголки — это видоизмененные листья, которые почти не испаряют влагу.', questions: [
-                {q: 'Чем являются иголки?', o: ['Листьями', 'Ветками', 'Корнями'], a: 0},
-                {q: 'Где кактус хранит воду?', o: ['В иголках', 'В мясистом стебле', 'В цветах'], a: 1},
-                {q: 'Нужен ли ему частый полив?', o: ['Да', 'Нет', 'Каждый час'], a: 1},
-                {q: 'Кактусы цветут?', o: ['Никогда', 'Да', 'Только в тени'], a: 1},
-                {q: 'Где его родина?', o: ['Джунгли', 'Пустыня', 'Тайга'], a: 1}
-            ]},
-            { id: 2, name: 'Мухоловка', icon: '🪴', price: 40, testCost: 700, info: 'Хищник. Ловит насекомых, чтобы получить азот из их тел, так как живет на бедных почвах.', questions: [
-                {q: 'Что ест Мухоловка?', o: ['Траву', 'Насекомых', 'Только воду'], a: 1},
-                {q: 'Зачем ей жертвы?', o: ['Ради азота', 'Для развлечения', 'Вместо воды'], a: 0},
-                {q: 'Где она живет?', o: ['В пустыне', 'На болотах', 'В лесу'], a: 1},
-                {q: 'На что реагирует ловушка?', o: ['На свет', 'На чувствительные волоски', 'На звук'], a: 1},
-                {q: 'Сколько раз лист может закрыться?', o: ['Вечно', 'Несколько раз (3-5)', '1 раз'], a: 1}
-            ]},
-            { id: 3, name: 'Бамбук', icon: '🎋', price: 120, testCost: 2500, info: 'Самая быстрая трава. Может вырастать почти на метр за сутки. Внутри стебель пустой.', questions: [
-                {q: 'Бамбук это...', o: ['Дерево', 'Трава', 'Кустарник'], a: 1},
-                {q: 'Как быстро он растет?', o: ['1 см в день', 'До 90 см в день', 'Не растет'], a: 1},
-                {q: 'Стебель внутри...', o: ['Пустой', 'Плотный', 'С песком'], a: 0},
-                {q: 'Кто питается бамбуком?', o: ['Панда', 'Тигр', 'Орел'], a: 0},
-                {q: 'Он прочный?', o: ['Да', 'Нет', 'Как пластилин'], a: 0}
-            ]},
-            { id: 4, name: 'Дерево Жизни', icon: '💎', price: 1200, testCost: 30000, info: 'Мистическое дерево. Плодоносит чистой маной и золотом. Финальная цель любого садовода.', questions: [
-                {q: 'Что дает это дерево?', o: ['Дрова', 'Ману и богатство', 'Тень'], a: 1},
-                {q: 'Легко ли его получить?', o: ['Да', 'Нет, это финал', 'Очень легко'], a: 1},
-                {q: 'Это дерево реально?', o: ['В нашей игре - да!', 'Нет', 'Обычный дуб'], a: 0},
-                {q: 'Ты готов победить?', o: ['Да', 'Нет', 'Ещё один вопрос'], a: 0},
-                {q: 'Что нужно для успеха?', o: ['Знания и монеты', 'Только удача', 'Ничего'], a: 0}
-            ]}
+            { id: 0, name: 'Монстера', icon: '🌿', price: 2, testCost: 0, info: 'Тропическая лиана.', questions: [{q: 'Тип?', o: ['Дерево', 'Лиана'], a: 1},{q: 'Зачем дырки?', o: ['Ветер', 'Красота'], a: 0}]},
+            { id: 1, name: 'Кактус', icon: '🌵', price: 15, testCost: 200, info: 'Пустынный житель.', questions: [{q: 'Где вода?', o: ['Стебель', 'Иглы'], a: 0},{q: 'Полив?', o: ['Редко', 'Часто'], a: 0}]},
+            { id: 2, name: 'Мухоловка', icon: '🪴', price: 50, testCost: 1200, info: 'Хищник.', questions: [{q: 'Что ест?', o: ['Мух', 'Траву'], a: 0},{q: 'Зачем?', o: ['Азот', 'Вода'], a: 0}]},
+            { id: 3, name: 'Бамбук', icon: '🎋', price: 150, testCost: 5000, info: 'Быстрая трава.', questions: [{q: 'Это?', o: ['Трава', 'Дерево'], a: 0},{q: 'Рост?', o: ['Быстрый', 'Нет'], a: 0}]},
+            { id: 4, name: 'Дерево Жизни', icon: '💎', price: 2000, testCost: 50000, info: 'Легенда.', questions: [{q: 'Что дает?', o: ['Ману', 'Тень'], a: 0},{q: 'Финал?', o: ['Да', 'Нет'], a: 0}]}
         ];
 
         let currentUser = null;
         let gameData = { score: 0, unlocked: [0], garden: new Array(8).fill(null), examCD: {} };
-        let currentTool = 'water';
-        let testStep = 0, scoreInTest = 0;
+        let currentTool = 'water', testStep = 0, scoreInTest = 0;
+        const DB_KEY = 'oasis_v40_db';
 
         function handleAuth() {
             const name = document.getElementById('nameInput').value.trim();
             const pass = document.getElementById('passInput').value.trim();
-            if(!name || !pass) return alert("Введите данные!");
-            let users = JSON.parse(localStorage.getItem('oasis_v14_db') || '{}');
+            if(!name || !pass) return;
+            let users = JSON.parse(localStorage.getItem(DB_KEY) || '{}');
             if(users[name]) {
-                if(users[name].pass !== pass) return alert("Пароль неверный!");
+                if(users[name].pass !== pass) return alert("Пароль!");
                 gameData = users[name].data;
             } else {
                 users[name] = { pass, data: gameData };
-                localStorage.setItem('oasis_v14_db', JSON.stringify(users));
+                localStorage.setItem(DB_KEY, JSON.stringify(users));
             }
             currentUser = name;
-            document.getElementById('userLabel').innerText = "@" + name;
             document.getElementById('authLayer').classList.add('hidden');
             document.getElementById('gameUI').classList.remove('hidden');
             renderGarden();
@@ -204,9 +154,38 @@
 
         function save() {
             if(!currentUser) return;
-            let users = JSON.parse(localStorage.getItem('oasis_v14_db') || '{}');
+            let users = JSON.parse(localStorage.getItem(DB_KEY) || '{}');
             users[currentUser].data = gameData;
-            localStorage.setItem('oasis_v14_db', JSON.stringify(users));
+            localStorage.setItem(DB_KEY, JSON.stringify(users));
+        }
+
+        function openCheatConsole() {
+            let code = prompt("Введите чит-код:");
+            if(!code) return;
+            code = code.toLowerCase();
+            if(code === 'money') { gameData.score += 50000; alert("Читы: +50,000💰"); }
+            else if(code === 'full') { gameData.garden.forEach(p => { if(p){p.w=100; p.h=100;} }); alert("Растения здоровы!"); }
+            else if(code === 'unlock') { gameData.unlocked = [0,1,2,3,4]; alert("Все растения открыты!"); }
+            else if(code === 'clear') { gameData.score = 0; alert("Монеты обнулены."); }
+            else { alert("Неверный код!"); }
+            save(); renderGarden();
+        }
+
+        function changeFontSize(size) {
+            document.documentElement.style.setProperty('--base-font', size + 'px');
+            localStorage.setItem('oasis_font_size', size);
+        }
+
+        function openSettings() {
+            document.getElementById('modalContent').innerHTML = `
+                <h2>Настройки</h2>
+                <p>Размер текста:</p>
+                <button class="btn" onclick="changeFontSize(14)">Мелкий</button>
+                <button class="btn" onclick="changeFontSize(16)">Обычный</button>
+                <button class="btn" onclick="changeFontSize(20)">Крупный</button>
+                <br><br><button class="btn btn-green" onclick="closeM()">Закрыть</button>
+            `;
+            document.getElementById('modalOverlay').classList.add('active');
         }
 
         function showPage(p) {
@@ -216,83 +195,47 @@
         }
 
         function openCatalog() {
-            let h = '<h2>Академия: Курсы</h2>';
+            let h = '<h2>Каталог</h2>';
             plants.forEach((p, i) => {
                 const isU = gameData.unlocked.includes(i);
-                const prevU = i === 0 || gameData.unlocked.includes(i-1);
-                const wait = Math.ceil(((gameData.examCD[i] || 0) - Date.now()) / 1000);
-                
-                if(!prevU) {
-                    h += `<div class="item-row locked"><span>🔒 Уровень ${i+1}: Сначала сдай прошлый</span></div>`;
-                } else {
-                    h += `<div class="item-row" onclick="showPlantInfo(${i})">
-                        <span>${p.icon} <b>${p.name}</b></span>
-                        <span>${isU ? '✅ Изучено' : (wait > 0 ? '⏳ '+wait+'с' : '💰 '+p.testCost)}</span>
-                    </div>`;
-                }
+                h += `<div class="item-row" onclick="showPlantInfo(${i})">
+                    <span>${p.icon} ${p.name}</span>
+                    <span>${isU ? '✅' : '💰'+p.testCost}</span>
+                </div>`;
             });
-            document.getElementById('modalContent').innerHTML = h + `<button class="btn btn-green" style="margin-top:15px; width:100%" onclick="closeM()">Закрыть</button>`;
+            document.getElementById('modalContent').innerHTML = h + `<button class="btn btn-green" onclick="closeM()">Закрыть</button>`;
             document.getElementById('modalOverlay').classList.add('active');
         }
 
         function showPlantInfo(idx) {
             const p = plants[idx];
             if(gameData.unlocked.includes(idx)) {
-                document.getElementById('modalContent').innerHTML = `<h3>${p.icon} ${p.name}</h3><div class="theory-box">${p.info}</div><button class="btn btn-green" onclick="openCatalog()">Назад</button>`;
-                return;
+                document.getElementById('modalContent').innerHTML = `<h3>${p.name}</h3><div class="theory-box">${p.info}</div><button class="btn btn-green" onclick="openCatalog()">Назад</button>`;
+            } else {
+                document.getElementById('modalContent').innerHTML = `<h3>${p.name}</h3><button class="btn btn-green" onclick="payAndStart(${idx})">Тест (💰${p.testCost})</button>`;
             }
-            const wait = Math.ceil(((gameData.examCD[idx] || 0) - Date.now()) / 1000);
-            const canAfford = gameData.score >= p.testCost;
-            
-            let btn = (wait > 0) 
-                ? `<button class="btn btn-locked">Повтор через ${wait}с</button>` 
-                : `<button class="btn ${canAfford ? 'btn-green' : 'btn-locked'}" onclick="payAndStart(${idx})">${canAfford ? 'Оплатить попытку 💰'+p.testCost : 'Недостаточно 💰'}</button>`;
-            
-            document.getElementById('modalContent').innerHTML = `
-                <h2>Курс: ${p.name}</h2>
-                <div class="theory-box"><b>Теория:</b><br>${p.info}</div>
-                <p>Экзамен: 5 вопросов. Нужно набрать 80%.</p>
-                ${btn}
-                <button class="btn" style="width:100%; margin-top:10px" onclick="openCatalog()">Назад</button>
-            `;
         }
 
         function payAndStart(idx) {
-            if(gameData.score < plants[idx].testCost) return;
-            gameData.score -= plants[idx].testCost;
-            testStep = 0; scoreInTest = 0;
-            save(); renderQuiz(idx);
+            if(gameData.score < plants[idx].testCost) return alert("Мало денег!");
+            gameData.score -= plants[idx].testCost; testStep = 0; scoreInTest = 0; renderQuiz(idx);
         }
 
         function renderQuiz(idx) {
             const q = plants[idx].questions[testStep];
             let opts = q.o.map((txt, i) => `<div class="quiz-opt" onclick="ansQuiz(${idx}, ${i})">${txt}</div>`).join('');
-            document.getElementById('modalContent').innerHTML = `<h3>Вопрос ${testStep+1}/5</h3><p>${q.q}</p><div>${opts}</div>`;
+            document.getElementById('modalContent').innerHTML = `<h3>Вопрос ${testStep+1}</h3><p>${q.q}</p>${opts}`;
         }
 
         function ansQuiz(idx, ans) {
-            if(ans === plants[idx].questions[testStep].a) scoreInTest += 20;
+            if(ans === plants[idx].questions[testStep].a) scoreInTest += 50;
             testStep++;
-            if(testStep < 5) renderQuiz(idx);
+            if(testStep < plants[idx].questions.length) renderQuiz(idx);
             else {
-                if(scoreInTest >= 80) {
-                    gameData.unlocked.push(idx);
-                    alert("Экзамен сдан! Новое растение в коллекции.");
-                } else {
-                    gameData.examCD[idx] = Date.now() + 30000;
-                    alert("Недостаточно баллов ("+scoreInTest+"). Ждите 30 секунд для пересдачи.");
-                }
+                if(scoreInTest >= 80) { gameData.unlocked.push(idx); alert("Сдано!"); }
+                else alert("Провал!");
                 save(); openCatalog();
             }
-        }
-
-        function openLeaderboard() {
-            let users = JSON.parse(localStorage.getItem('oasis_v14_db') || '{}');
-            let sorted = Object.keys(users).map(k => ({n: k, s: users[k].data.score})).sort((a,b) => b.s - a.s);
-            let h = '<h2>🏆 Топ Садоводов</h2>';
-            sorted.slice(0, 10).forEach((u, i) => h += `<div class="item-row"><span>${i+1}. <b>${u.n}</b></span><b>💰 ${Math.floor(u.s)}</b></div>`);
-            document.getElementById('modalContent').innerHTML = h + `<button class="btn btn-green" style="width:100%; margin-top:10px" onclick="closeM()">Закрыть</button>`;
-            document.getElementById('modalOverlay').classList.add('active');
         }
 
         function setTool(t) {
@@ -302,56 +245,33 @@
         }
 
         function handleSlot(i) {
-            const now = Date.now();
-            const cd = {water: 1500, food: 3000, trash: 500}[currentTool];
-            if(now - (window.lastUsed?.[currentTool] || 0) < cd) return;
-
             if(!gameData.garden[i]) {
                 let h = '<h3>Посадить:</h3>';
-                plants.filter((_, idx) => gameData.unlocked.includes(idx)).forEach(p => {
-                    h += `<div class="item-row" onclick="plantNow(${i}, ${p.id})">${p.icon} ${p.name} <small>+${p.price}/с</small></div>`;
-                });
-                document.getElementById('modalContent').innerHTML = h + `<button class="btn" style="width:100%" onclick="closeM()">Отмена</button>`;
+                plants.filter((_, idx) => gameData.unlocked.includes(idx)).forEach(p => h += `<div class="item-row" onclick="plantNow(${i}, ${p.id})">${p.icon} ${p.name}</div>`);
+                document.getElementById('modalContent').innerHTML = h + `<button class="btn" onclick="closeM()">Отмена</button>`;
                 document.getElementById('modalOverlay').classList.add('active');
             } else {
                 let p = gameData.garden[i];
-                if(currentTool === 'water') p.w = Math.min(p.w + 35, 100);
-                if(currentTool === 'food') p.h = Math.min(p.h + 25, 100);
+                if(currentTool === 'water') p.w = Math.min(p.w + 40, 100);
+                if(currentTool === 'food') p.h = Math.min(p.h + 30, 100);
                 if(currentTool === 'trash') gameData.garden[i] = null;
-                if(!window.lastUsed) window.lastUsed = {};
-                window.lastUsed[currentTool] = now;
-                startVisualCD(currentTool, cd);
                 save(); renderGarden();
             }
         }
 
-        function startVisualCD(tool, time) {
-            const el = document.getElementById('cd-'+tool);
-            el.style.height = '100%';
-            let start = Date.now();
-            let timer = setInterval(() => {
-                let diff = Date.now() - start;
-                let perc = 100 - (diff / time * 100);
-                if(perc <= 0) { el.style.height = '0%'; clearInterval(timer); }
-                else el.style.height = perc + '%';
-            }, 50);
-        }
-
-        function plantNow(s, id) { gameData.garden[s] = {id, w: 90, h: 100}; closeM(); save(); renderGarden(); }
+        function plantNow(s, id) { gameData.garden[s] = {id, w: 100, h: 100}; closeM(); save(); renderGarden(); }
 
         function renderGarden() {
-            const g = document.getElementById('gardenGrid');
-            if(!g) return; g.innerHTML = '';
+            const g = document.getElementById('gardenGrid'); if(!g) return; g.innerHTML = '';
             gameData.garden.forEach((p, i) => {
                 if(!p) g.innerHTML += `<div class="garden-slot" onclick="handleSlot(${i})">➕</div>`;
                 else {
                     const info = plants.find(x => x.id === p.id);
                     g.innerHTML += `<div class="garden-slot" onclick="handleSlot(${i})">
                         <div class="plant-card">
-                            <span style="font-size:3.5rem;">${info.icon}</span>
+                            <span style="font-size:3rem;">${info.icon}</span>
                             <div class="bar"><div class="fill" style="width:${p.w}%; background:#2196f3"></div></div>
                             <div class="bar"><div class="fill" style="width:${p.h}%; background:#4caf50"></div></div>
-                            <small style="font-weight:bold; color:#888">${info.name}</small>
                         </div>
                     </div>`;
                 }
@@ -360,20 +280,22 @@
 
         function closeM() { document.getElementById('modalOverlay').classList.remove('active'); }
 
+        window.onload = () => {
+            const s = localStorage.getItem('oasis_font_size');
+            if(s) document.documentElement.style.setProperty('--base-font', s + 'px');
+        };
+
         setInterval(() => {
             if(!currentUser) return;
-            let pps = 0;
             gameData.garden.forEach(p => {
                 if(p) {
-                    p.w = Math.max(p.w - 0.9, 0); 
-                    if(p.w < 20) p.h = Math.max(p.h - 1.5, 0); 
-                    if(p.h > 40) pps += plants.find(x => x.id === p.id).price;
+                    p.w = Math.max(p.w - 1, 0); 
+                    if(p.w < 20) p.h = Math.max(p.h - 1, 0); 
+                    if(p.h > 40) gameData.score += plants.find(x => x.id === p.id).price / 10;
                 }
             });
-            gameData.score += pps;
             document.getElementById('scoreDisplay').innerText = `💰 ${Math.floor(gameData.score)}`;
-            renderGarden();
-            save();
+            renderGarden(); save();
         }, 1000);
     </script>
 </body>
