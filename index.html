@@ -31,24 +31,31 @@
         .layer { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 10; padding-top: 60px; padding-bottom: 100px; }
         .hidden { display: none !important; }
 
-        /* Экраны входа и выбора */
-        #authLayer, #deviceLayer { position: fixed; inset: 0; z-index: 2000; background: #000; display: flex; justify-content: center; align-items: center; padding: 20px; }
-        .card { background: white; color: #333; padding: 30px; border-radius: 30px; width: 100%; max-width: 350px; text-align: center; border: 4px solid var(--primary); }
+        /* Экраны входа и выбора - ПРИНУДИТЕЛЬНЫЙ ЦЕНТР */
+        #authLayer, #deviceLayer { 
+            position: fixed; inset: 0; z-index: 2000; 
+            background: rgba(0,0,0,0.95); 
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center; padding: 20px; 
+        }
+
+        .card { background: white; color: #333; padding: 30px; border-radius: 30px; width: 100%; max-width: 350px; text-align: center; border: 4px solid var(--primary); box-shadow: 0 0 30px rgba(0,0,0,0.5); }
         .auth-input { width: 100%; padding: 15px; margin: 10px 0; border-radius: 15px; border: 2px solid #ddd; font-size: 1rem; }
 
         /* Кнопки */
         .btn { padding: 15px 25px; border-radius: 50px; border: none; font-weight: bold; cursor: pointer; font-family: 'Ubuntu'; text-transform: uppercase; font-size: 0.9rem; transition: 0.2s; }
         .btn-green { background: var(--primary); color: white; }
-        .btn-device { width: 100%; margin: 10px 0; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .btn-device { width: 100%; margin: 10px 0; font-size: 1.1rem; border: 2px solid var(--primary); }
+        .btn-device:hover { background: var(--light-green); color: #000; }
 
         /* Игровой интерфейс */
         .site-header { position: absolute; top: 0; width: 100%; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; z-index: 100; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); border-bottom: 2px solid var(--primary); }
-        .site-title { font-family: 'Montserrat'; color: var(--accent); }
+        .site-title { font-family: 'Montserrat'; color: var(--accent); font-size: 1.2rem; }
 
-        /* Сетка сада (меняется через JS) */
-        .garden-grid { display: grid; gap: 12px; width: 95%; max-width: 800px; justify-content: center; }
-        .is-pc .garden-grid { grid-template-columns: repeat(4, 160px); }
-        .is-mobile .garden-grid { grid-template-columns: repeat(2, 1fr); max-width: 400px; }
+        /* Сетка сада */
+        .garden-grid { display: grid; gap: 12px; width: 95%; max-width: 800px; justify-content: center; margin: auto; }
+        .is-pc .garden-grid { grid-template-columns: repeat(4, 150px); }
+        .is-mobile .garden-grid { grid-template-columns: repeat(2, 1fr); max-width: 350px; }
 
         .garden-slot { aspect-ratio: 4/5; background: rgba(255,255,255,0.1); border: 2px dashed rgba(255,255,255,0.3); border-radius: 20px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
         .plant-card { width: 100%; height: 100%; background: var(--card-bg); color: #333; border-radius: 18px; padding: 10px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; }
@@ -59,34 +66,34 @@
         .hotbar { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 15px; background: rgba(0,0,0,0.9); padding: 12px 20px; border-radius: 35px; border: 1px solid #444; z-index: 500; }
         .tool { width: 55px; height: 55px; background: #222; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; cursor: pointer; position: relative; overflow: hidden; }
         .tool.active { border: 2px solid var(--accent); background: #333; }
-        .cd-overlay { position: absolute; bottom: 0; left: 0; width: 100%; height: 0%; background: rgba(0,0,0,0.6); pointer-events: none; }
 
         /* Модалки */
         .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 1500; display: flex; justify-content: center; align-items: center; opacity: 0; visibility: hidden; padding: 20px; }
         .overlay.active { opacity: 1; visibility: visible; }
-        .modal { background: white; color: #333; width: 100%; max-width: 400px; padding: 25px; border-radius: 30px; text-align: center; max-height: 80vh; overflow-y: auto; }
+        .modal { background: white; color: #333; width: 100%; max-width: 400px; padding: 25px; border-radius: 30px; text-align: center; }
         .item-row { display: flex; justify-content: space-between; align-items: center; padding: 12px; background: #f4f9f4; margin: 8px 0; border-radius: 15px; border: 1px solid #eee; cursor: pointer; }
         
-        .cheat-btn { position: fixed; bottom: 10px; left: 10px; width: 35px; height: 35px; background: rgba(0,0,0,0.4); color: #777; border: none; border-radius: 8px; cursor: pointer; z-index: 1000; }
+        .cheat-btn { position: fixed; bottom: 10px; left: 10px; width: 35px; height: 35px; background: rgba(0,0,0,0.4); color: #555; border: none; border-radius: 8px; cursor: pointer; z-index: 1000; font-family: monospace; }
     </style>
 </head>
-<body class="is-pc"> <div class="main-bg"></div>
+<body>
+    <div class="main-bg"></div>
     <button class="cheat-btn" onclick="openCheatConsole()">\</button>
 
     <div id="authLayer">
         <div class="card">
-            <h1 style="color: var(--primary); margin: 0;">OASIS</h1>
-            <p>Вход в систему</p>
+            <h1 style="color: var(--primary); margin: 0; font-family: 'Montserrat';">OASIS</h1>
+            <p>Вход или Регистрация</p>
             <input type="text" id="nameInput" class="auth-input" placeholder="Никнейм">
             <input type="password" id="passInput" class="auth-input" placeholder="Пароль">
-            <button class="btn btn-green" style="width: 100%;" onclick="handleAuth()">ДАЛЕЕ</button>
+            <button class="btn btn-green" style="width: 100%; margin-top: 10px;" onclick="handleAuth()">ВОЙТИ</button>
         </div>
     </div>
 
     <div id="deviceLayer" class="hidden">
         <div class="card">
-            <h2 style="color: var(--primary);">С чего играем?</h2>
-            <p>Выберите режим оптимизации:</p>
+            <h2 style="color: var(--primary); margin-top: 0;">Режим игры</h2>
+            <p>Выберите устройство для оптимизации интерфейса:</p>
             <button class="btn btn-green btn-device" onclick="setDevice('pc')">💻 КОМПЬЮТЕР</button>
             <button class="btn btn-green btn-device" onclick="setDevice('mobile')">📱 ТЕЛЕФОН</button>
         </div>
@@ -97,8 +104,7 @@
             <div class="site-title">OASIS</div>
             <div style="display: flex; align-items: center; gap: 10px;">
                 <span id="scoreDisplay" style="font-size:1.1rem; color:var(--accent); font-weight:bold;">💰 0</span>
-                <button onclick="openSettings()" style="background:none; border:none; font-size:1.2rem;">⚙️</button>
-                <button onclick="location.reload()" style="background:none; border:none; font-size:1.2rem;">🚪</button>
+                <button onclick="location.reload()" style="background:none; border:none; font-size:1.2rem; cursor:pointer;">🚪</button>
             </div>
         </header>
 
@@ -108,17 +114,16 @@
         </nav>
 
         <div id="mainPage" class="layer">
-            <h1 style="color:var(--light-green); text-align:center;">АКАДЕМИЯ</h1>
-            <p style="color:white; text-align:center; padding: 0 20px;">Изучай биологию и открывай новые семена!</p>
-            <button class="btn btn-green" onclick="openCatalog()">КАТАЛОГ</button>
+            <h1 style="color:var(--light-green); text-shadow: 0 0 10px #000;">АКАДЕМИЯ</h1>
+            <button class="btn btn-green" style="padding: 20px 50px;" onclick="openCatalog()">КАТАЛОГ СЕМЯН</button>
         </div>
 
         <div id="gardenPage" class="layer hidden">
             <div class="garden-grid" id="gardenGrid"></div>
             <div class="hotbar">
-                <div class="tool active" id="t-water" onclick="setTool('water')">💧 <div id="cd-water" class="cd-overlay"></div></div>
-                <div class="tool" id="t-food" onclick="setTool('food')">🧪 <div id="cd-food" class="cd-overlay"></div></div>
-                <div class="tool" id="t-trash" onclick="setTool('trash')">🗑️ <div id="cd-trash" class="cd-overlay"></div></div>
+                <div class="tool active" id="t-water" onclick="setTool('water')">💧</div>
+                <div class="tool" id="t-food" onclick="setTool('food')">🧪</div>
+                <div class="tool" id="t-trash" onclick="setTool('trash')">🗑️</div>
             </div>
         </div>
     </div>
@@ -127,40 +132,50 @@
 
     <script>
         const plants = [
-            { id: 0, name: 'Монстера', icon: '🌿', price: 2, testCost: 0, info: 'Тропическая лиана.' },
-            { id: 1, name: 'Кактус', icon: '🌵', price: 15, testCost: 300, info: 'Живет в пустыне.' },
-            { id: 2, name: 'Мухоловка', icon: '🪴', price: 60, testCost: 1500, info: 'Хищное растение.' },
-            { id: 3, name: 'Бамбук', icon: '🎋', price: 180, testCost: 6000, info: 'Растет очень быстро.' },
-            { id: 4, name: 'Оазис', icon: '💎', price: 2500, testCost: 40000, info: 'Легендарный цветок.' }
+            { id: 0, name: 'Монстера', icon: '🌿', price: 2, testCost: 0 },
+            { id: 1, name: 'Кактус', icon: '🌵', price: 15, testCost: 300 },
+            { id: 2, name: 'Мухоловка', icon: '🪴', price: 60, testCost: 1500 },
+            { id: 3, name: 'Бамбук', icon: '🎋', price: 180, testCost: 6000 },
+            { id: 4, name: 'Оазис', icon: '💎', price: 2500, testCost: 40000 }
         ];
 
         let currentUser = null;
         let gameData = { score: 0, unlocked: [0], garden: new Array(8).fill(null) };
         let currentTool = 'water';
-        const DB_KEY = 'oasis_cross_v1';
+        const DB_KEY = 'oasis_final_fix_v1';
 
-        // 1. Авторизация
+        // 1. Логин
         function handleAuth() {
             const name = document.getElementById('nameInput').value.trim();
             const pass = document.getElementById('passInput').value.trim();
-            if(!name || !pass) return alert("Введите данные!");
+            if(!name || !pass) return alert("Заполните все поля!");
             
             let users = JSON.parse(localStorage.getItem(DB_KEY) || '{}');
             if(users[name]) {
-                if(users[name].pass !== pass) return alert("Неверный пароль!");
+                if(users[name].pass !== pass) return alert("Пароль неверный!");
                 gameData = users[name].data;
             } else {
-                users[name] = { pass, data: gameData };
+                users[name] = { pass, data: { score: 0, unlocked: [0], garden: new Array(8).fill(null) } };
                 localStorage.setItem(DB_KEY, JSON.stringify(users));
+                gameData = users[name].data;
             }
             currentUser = name;
+
+            // ПЕРЕКЛЮЧЕНИЕ: Прячем логин, показываем выбор устройства
             document.getElementById('authLayer').classList.add('hidden');
-            document.getElementById('deviceLayer').classList.remove('hidden'); // Переход к выбору устройства
+            document.getElementById('deviceLayer').classList.remove('hidden');
         }
 
-        // 2. Установка режима (ПК или Мобила)
+        // 2. Выбор устройства
         function setDevice(type) {
-            document.body.className = (type === 'pc') ? 'is-pc' : 'is-mobile';
+            if(type === 'pc') {
+                document.body.classList.add('is-pc');
+                document.body.classList.remove('is-mobile');
+            } else {
+                document.body.classList.add('is-mobile');
+                document.body.classList.remove('is-pc');
+            }
+            
             document.getElementById('deviceLayer').classList.add('hidden');
             document.getElementById('gameUI').classList.remove('hidden');
             renderGarden();
@@ -174,14 +189,14 @@
         }
 
         function openCheatConsole() {
-            let code = prompt("Введите чит-код (money / unlock):");
+            let code = prompt("Чит-код:");
             if(code === 'money') gameData.score += 50000;
             if(code === 'unlock') gameData.unlocked = [0,1,2,3,4];
             save(); renderGarden();
         }
 
         function openCatalog() {
-            let h = '<h3>Академия</h3>';
+            let h = '<h3>Каталог</h3>';
             plants.forEach((p, i) => {
                 const isU = gameData.unlocked.includes(i);
                 h += `<div class="item-row" onclick="showPlantInfo(${i})">
@@ -189,16 +204,16 @@
                     <span>${isU ? '✅' : '💰'+p.testCost}</span>
                 </div>`;
             });
-            document.getElementById('modalContent').innerHTML = h + `<button class="btn btn-green" onclick="closeM()">Закрыть</button>`;
+            document.getElementById('modalContent').innerHTML = h + `<button class="btn btn-green" style="width:100%" onclick="closeM()">Закрыть</button>`;
             document.getElementById('modalOverlay').classList.add('active');
         }
 
         function showPlantInfo(idx) {
             const p = plants[idx];
             if(gameData.unlocked.includes(idx)) {
-                document.getElementById('modalContent').innerHTML = `<h3>${p.name}</h3><p>${p.info}</p><button class="btn btn-green" onclick="openCatalog()">Назад</button>`;
+                document.getElementById('modalContent').innerHTML = `<h3>${p.name}</h3><p>Уже открыто!</p><button class="btn btn-green" onclick="openCatalog()">Назад</button>`;
             } else {
-                document.getElementById('modalContent').innerHTML = `<h3>${p.name}</h3><button class="btn btn-green" onclick="unlockPlant(${idx})">Купить за 💰${p.testCost}</button>`;
+                document.getElementById('modalContent').innerHTML = `<h3>${p.name}</h3><button class="btn btn-green" onclick="unlockPlant(${idx})">Купить (💰${p.testCost})</button>`;
             }
         }
 
@@ -207,7 +222,7 @@
                 gameData.score -= plants[idx].testCost;
                 gameData.unlocked.push(idx);
                 save(); openCatalog();
-            } else alert("Недостаточно монет!");
+            } else alert("Не хватает монет!");
         }
 
         function setTool(t) {
@@ -272,5 +287,3 @@
     </script>
 </body>
 </html>
-</html>
-
