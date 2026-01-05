@@ -2,8 +2,8 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Зеленый Оазис — Чит-панель</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Зеленый Оазис — Выбор режима</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800&family=Ubuntu:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root { 
@@ -11,100 +11,105 @@
             --light-green: #98ff98; --card-bg: rgba(255,255,255,0.95);
             --base-font: 16px; 
         }
-        * { box-sizing: border-box; outline: none; }
+        * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
         
         body, html { 
             margin: 0; padding: 0; height: 100%; width: 100%; 
             font-family: 'Ubuntu', sans-serif; 
             background-color: #0a1a0a; overflow: hidden;
-            font-size: var(--base-font); 
+            font-size: var(--base-font); touch-action: manipulation;
         }
 
         .main-bg {
             position: fixed; inset: 0; z-index: -1;
-            background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.7)), 
-                              url('https://images.pexels.com/photos/1072179/pexels-photo-1072179.jpeg?auto=compress&cs=tinysrgb&w=1920');
-            background-size: cover; background-position: center; background-repeat: no-repeat;
+            background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.8)), 
+                              url('https://images.pexels.com/photos/1072179/pexels-photo-1072179.jpeg?auto=compress&cs=tinysrgb&w=1280');
+            background-size: cover; background-position: center;
         }
 
-        .site-header { position: absolute; top: 0; width: 100%; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; z-index: 100; background: rgba(0,0,0,0.8); backdrop-filter: blur(15px); border-bottom: 2px solid var(--primary); }
-        .site-title { font-family: 'Montserrat'; font-size: 1.5rem; color: var(--accent); }
-        
-        #authLayer { position: fixed; inset: 0; z-index: 2000; background: #000; display: flex; justify-content: center; align-items: center; }
-        .auth-card { background: white; color: #333; padding: 40px; border-radius: 40px; width: 400px; text-align: center; border: 4px solid var(--primary); }
-        .auth-input { width: 100%; padding: 15px; margin: 10px 0; border-radius: 15px; border: 2px solid #ddd; font-size: 1rem; }
-
-        .layer { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 10; padding-top: 80px; }
+        /* Слои */
+        .layer { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 10; padding-top: 60px; padding-bottom: 100px; }
         .hidden { display: none !important; }
 
-        .garden-grid { display: grid; grid-template-columns: repeat(4, 160px); gap: 15px; }
-        .garden-slot { width: 160px; height: 190px; background: rgba(255,255,255,0.1); border: 2px dashed rgba(255,255,255,0.3); border-radius: 25px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; }
-        
-        .plant-card { width: 100%; height: 100%; background: var(--card-bg); color: #333; border-radius: 22px; padding: 12px; display: flex; flex-direction: column; align-items: center; box-shadow: 0 8px 15px rgba(0,0,0,0.5); }
-        .bar { width: 100%; height: 8px; background: #ddd; border-radius: 10px; margin: 4px 0; overflow: hidden; }
+        /* Экраны входа и выбора */
+        #authLayer, #deviceLayer { position: fixed; inset: 0; z-index: 2000; background: #000; display: flex; justify-content: center; align-items: center; padding: 20px; }
+        .card { background: white; color: #333; padding: 30px; border-radius: 30px; width: 100%; max-width: 350px; text-align: center; border: 4px solid var(--primary); }
+        .auth-input { width: 100%; padding: 15px; margin: 10px 0; border-radius: 15px; border: 2px solid #ddd; font-size: 1rem; }
+
+        /* Кнопки */
+        .btn { padding: 15px 25px; border-radius: 50px; border: none; font-weight: bold; cursor: pointer; font-family: 'Ubuntu'; text-transform: uppercase; font-size: 0.9rem; transition: 0.2s; }
+        .btn-green { background: var(--primary); color: white; }
+        .btn-device { width: 100%; margin: 10px 0; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; gap: 10px; }
+
+        /* Игровой интерфейс */
+        .site-header { position: absolute; top: 0; width: 100%; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; z-index: 100; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); border-bottom: 2px solid var(--primary); }
+        .site-title { font-family: 'Montserrat'; color: var(--accent); }
+
+        /* Сетка сада (меняется через JS) */
+        .garden-grid { display: grid; gap: 12px; width: 95%; max-width: 800px; justify-content: center; }
+        .is-pc .garden-grid { grid-template-columns: repeat(4, 160px); }
+        .is-mobile .garden-grid { grid-template-columns: repeat(2, 1fr); max-width: 400px; }
+
+        .garden-slot { aspect-ratio: 4/5; background: rgba(255,255,255,0.1); border: 2px dashed rgba(255,255,255,0.3); border-radius: 20px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .plant-card { width: 100%; height: 100%; background: var(--card-bg); color: #333; border-radius: 18px; padding: 10px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; }
+        .bar { width: 100%; height: 6px; background: #ddd; border-radius: 10px; overflow: hidden; }
         .fill { height: 100%; transition: 0.5s; }
 
-        .btn { padding: 12px 25px; border-radius: 50px; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; font-family: 'Ubuntu'; text-transform: uppercase; font-size: 0.9rem; }
-        .btn-green { background: var(--primary); color: white; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        /* Хотбар инструментов */
+        .hotbar { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 15px; background: rgba(0,0,0,0.9); padding: 12px 20px; border-radius: 35px; border: 1px solid #444; z-index: 500; }
+        .tool { width: 55px; height: 55px; background: #222; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; cursor: pointer; position: relative; overflow: hidden; }
+        .tool.active { border: 2px solid var(--accent); background: #333; }
+        .cd-overlay { position: absolute; bottom: 0; left: 0; width: 100%; height: 0%; background: rgba(0,0,0,0.6); pointer-events: none; }
 
-        .hotbar { position: absolute; bottom: 30px; display: flex; gap: 15px; background: rgba(0,0,0,0.85); padding: 15px; border-radius: 30px; border: 1px solid #444; }
-        .tool { width: 60px; height: 60px; background: #222; border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; cursor: pointer; position: relative; overflow: hidden; }
-        .tool.active { border: 2px solid var(--accent); box-shadow: 0 0 15px var(--accent); }
-        .cd-overlay { position: absolute; bottom: 0; left: 0; width: 100%; height: 0%; background: rgba(0,0,0,0.7); pointer-events: none; }
-
-        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 1000; display: flex; justify-content: center; align-items: center; opacity: 0; visibility: hidden; transition: 0.3s; }
+        /* Модалки */
+        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 1500; display: flex; justify-content: center; align-items: center; opacity: 0; visibility: hidden; padding: 20px; }
         .overlay.active { opacity: 1; visibility: visible; }
-        .modal { background: white; color: #333; width: 90%; max-width: 500px; padding: 30px; border-radius: 35px; text-align: center; max-height: 85vh; overflow-y: auto; }
+        .modal { background: white; color: #333; width: 100%; max-width: 400px; padding: 25px; border-radius: 30px; text-align: center; max-height: 80vh; overflow-y: auto; }
+        .item-row { display: flex; justify-content: space-between; align-items: center; padding: 12px; background: #f4f9f4; margin: 8px 0; border-radius: 15px; border: 1px solid #eee; cursor: pointer; }
         
-        .item-row { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: #f4f9f4; margin: 8px 0; border-radius: 20px; cursor: pointer; border: 1px solid #eee; }
-        .theory-box { background: #e8f5e9; padding: 15px; border-radius: 15px; text-align: left; margin: 15px 0; border-left: 5px solid var(--primary); font-size: 1em; }
-        .quiz-opt { width: 100%; padding: 12px; margin: 6px 0; border: 2px solid #eee; border-radius: 12px; cursor: pointer; font-weight: bold; font-size: 1em; }
-
-        .home-title { font-size: 3.5rem; color: var(--light-green); text-shadow: 0 0 20px rgba(152, 255, 152, 0.6); margin-bottom: 10px; font-family: 'Montserrat'; text-align: center; }
-        .home-desc { font-size: 1.2rem; color: var(--light-green); text-align: center; max-width: 600px; font-weight: bold; }
-
-        /* Кнопка Читов */
-        .cheat-btn {
-            position: fixed; bottom: 10px; left: 10px;
-            width: 30px; height: 30px; background: rgba(0,0,0,0.5);
-            color: #555; border: none; border-radius: 5px;
-            cursor: pointer; font-family: monospace; z-index: 3000;
-        }
-        .cheat-btn:hover { color: var(--light-green); background: #000; }
+        .cheat-btn { position: fixed; bottom: 10px; left: 10px; width: 35px; height: 35px; background: rgba(0,0,0,0.4); color: #777; border: none; border-radius: 8px; cursor: pointer; z-index: 1000; }
     </style>
 </head>
-<body>
-    <div class="main-bg"></div>
-
+<body class="is-pc"> <div class="main-bg"></div>
     <button class="cheat-btn" onclick="openCheatConsole()">\</button>
 
     <div id="authLayer">
-        <div class="auth-card">
-            <h1>OASIS</h1>
+        <div class="card">
+            <h1 style="color: var(--primary); margin: 0;">OASIS</h1>
+            <p>Вход в систему</p>
             <input type="text" id="nameInput" class="auth-input" placeholder="Никнейм">
             <input type="password" id="passInput" class="auth-input" placeholder="Пароль">
-            <button class="btn btn-green" style="width: 100%;" onclick="handleAuth()">ВОЙТИ</button>
+            <button class="btn btn-green" style="width: 100%;" onclick="handleAuth()">ДАЛЕЕ</button>
+        </div>
+    </div>
+
+    <div id="deviceLayer" class="hidden">
+        <div class="card">
+            <h2 style="color: var(--primary);">С чего играем?</h2>
+            <p>Выберите режим оптимизации:</p>
+            <button class="btn btn-green btn-device" onclick="setDevice('pc')">💻 КОМПЬЮТЕР</button>
+            <button class="btn btn-green btn-device" onclick="setDevice('mobile')">📱 ТЕЛЕФОН</button>
         </div>
     </div>
 
     <div id="gameUI" class="hidden">
         <header class="site-header">
-            <div class="site-title">ЗЕЛЕНЫЙ ОАЗИС</div>
-            <div style="display: flex; align-items: center; gap: 15px;">
-                <span id="scoreDisplay" style="font-size:1.4rem; color:var(--accent); font-weight:bold;">💰 0</span>
-                <button onclick="openSettings()" style="background:none; border:none; font-size:1.5rem; cursor:pointer;">⚙️</button>
-                <button onclick="location.reload()" style="color:#ff5252; background:none; border:none; cursor:pointer;">ВЫХОД</button>
+            <div class="site-title">OASIS</div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <span id="scoreDisplay" style="font-size:1.1rem; color:var(--accent); font-weight:bold;">💰 0</span>
+                <button onclick="openSettings()" style="background:none; border:none; font-size:1.2rem;">⚙️</button>
+                <button onclick="location.reload()" style="background:none; border:none; font-size:1.2rem;">🚪</button>
             </div>
         </header>
 
-        <nav style="position: absolute; top: 85px; display: flex; gap: 10px; z-index: 100; left: 20px;">
+        <nav style="position: absolute; top: 65px; display: flex; justify-content: center; width: 100%; gap: 10px; z-index: 100;">
             <button class="btn btn-green" onclick="showPage('mainPage')">Академия</button>
             <button class="btn btn-green" onclick="showPage('gardenPage')">Сад</button>
         </nav>
 
         <div id="mainPage" class="layer">
-            <h1 class="home-title">АКАДЕМИЯ</h1>
-            <p class="home-desc">Изучай растения и создай свой рай!</p>
+            <h1 style="color:var(--light-green); text-align:center;">АКАДЕМИЯ</h1>
+            <p style="color:white; text-align:center; padding: 0 20px;">Изучай биологию и открывай новые семена!</p>
             <button class="btn btn-green" onclick="openCatalog()">КАТАЛОГ</button>
         </div>
 
@@ -122,25 +127,27 @@
 
     <script>
         const plants = [
-            { id: 0, name: 'Монстера', icon: '🌿', price: 2, testCost: 0, info: 'Тропическая лиана.', questions: [{q: 'Тип?', o: ['Дерево', 'Лиана'], a: 1},{q: 'Зачем дырки?', o: ['Ветер', 'Красота'], a: 0}]},
-            { id: 1, name: 'Кактус', icon: '🌵', price: 15, testCost: 200, info: 'Пустынный житель.', questions: [{q: 'Где вода?', o: ['Стебель', 'Иглы'], a: 0},{q: 'Полив?', o: ['Редко', 'Часто'], a: 0}]},
-            { id: 2, name: 'Мухоловка', icon: '🪴', price: 50, testCost: 1200, info: 'Хищник.', questions: [{q: 'Что ест?', o: ['Мух', 'Траву'], a: 0},{q: 'Зачем?', o: ['Азот', 'Вода'], a: 0}]},
-            { id: 3, name: 'Бамбук', icon: '🎋', price: 150, testCost: 5000, info: 'Быстрая трава.', questions: [{q: 'Это?', o: ['Трава', 'Дерево'], a: 0},{q: 'Рост?', o: ['Быстрый', 'Нет'], a: 0}]},
-            { id: 4, name: 'Дерево Жизни', icon: '💎', price: 2000, testCost: 50000, info: 'Легенда.', questions: [{q: 'Что дает?', o: ['Ману', 'Тень'], a: 0},{q: 'Финал?', o: ['Да', 'Нет'], a: 0}]}
+            { id: 0, name: 'Монстера', icon: '🌿', price: 2, testCost: 0, info: 'Тропическая лиана.' },
+            { id: 1, name: 'Кактус', icon: '🌵', price: 15, testCost: 300, info: 'Живет в пустыне.' },
+            { id: 2, name: 'Мухоловка', icon: '🪴', price: 60, testCost: 1500, info: 'Хищное растение.' },
+            { id: 3, name: 'Бамбук', icon: '🎋', price: 180, testCost: 6000, info: 'Растет очень быстро.' },
+            { id: 4, name: 'Оазис', icon: '💎', price: 2500, testCost: 40000, info: 'Легендарный цветок.' }
         ];
 
         let currentUser = null;
-        let gameData = { score: 0, unlocked: [0], garden: new Array(8).fill(null), examCD: {} };
-        let currentTool = 'water', testStep = 0, scoreInTest = 0;
-        const DB_KEY = 'oasis_v40_db';
+        let gameData = { score: 0, unlocked: [0], garden: new Array(8).fill(null) };
+        let currentTool = 'water';
+        const DB_KEY = 'oasis_cross_v1';
 
+        // 1. Авторизация
         function handleAuth() {
             const name = document.getElementById('nameInput').value.trim();
             const pass = document.getElementById('passInput').value.trim();
-            if(!name || !pass) return;
+            if(!name || !pass) return alert("Введите данные!");
+            
             let users = JSON.parse(localStorage.getItem(DB_KEY) || '{}');
             if(users[name]) {
-                if(users[name].pass !== pass) return alert("Пароль!");
+                if(users[name].pass !== pass) return alert("Неверный пароль!");
                 gameData = users[name].data;
             } else {
                 users[name] = { pass, data: gameData };
@@ -148,6 +155,13 @@
             }
             currentUser = name;
             document.getElementById('authLayer').classList.add('hidden');
+            document.getElementById('deviceLayer').classList.remove('hidden'); // Переход к выбору устройства
+        }
+
+        // 2. Установка режима (ПК или Мобила)
+        function setDevice(type) {
+            document.body.className = (type === 'pc') ? 'is-pc' : 'is-mobile';
+            document.getElementById('deviceLayer').classList.add('hidden');
             document.getElementById('gameUI').classList.remove('hidden');
             renderGarden();
         }
@@ -160,42 +174,14 @@
         }
 
         function openCheatConsole() {
-            let code = prompt("Введите чит-код:");
-            if(!code) return;
-            code = code.toLowerCase();
-            if(code === 'money') { gameData.score += 50000; alert("Читы: +50,000💰"); }
-            else if(code === 'full') { gameData.garden.forEach(p => { if(p){p.w=100; p.h=100;} }); alert("Растения здоровы!"); }
-            else if(code === 'unlock') { gameData.unlocked = [0,1,2,3,4]; alert("Все растения открыты!"); }
-            else if(code === 'clear') { gameData.score = 0; alert("Монеты обнулены."); }
-            else { alert("Неверный код!"); }
+            let code = prompt("Введите чит-код (money / unlock):");
+            if(code === 'money') gameData.score += 50000;
+            if(code === 'unlock') gameData.unlocked = [0,1,2,3,4];
             save(); renderGarden();
         }
 
-        function changeFontSize(size) {
-            document.documentElement.style.setProperty('--base-font', size + 'px');
-            localStorage.setItem('oasis_font_size', size);
-        }
-
-        function openSettings() {
-            document.getElementById('modalContent').innerHTML = `
-                <h2>Настройки</h2>
-                <p>Размер текста:</p>
-                <button class="btn" onclick="changeFontSize(14)">Мелкий</button>
-                <button class="btn" onclick="changeFontSize(16)">Обычный</button>
-                <button class="btn" onclick="changeFontSize(20)">Крупный</button>
-                <br><br><button class="btn btn-green" onclick="closeM()">Закрыть</button>
-            `;
-            document.getElementById('modalOverlay').classList.add('active');
-        }
-
-        function showPage(p) {
-            document.getElementById('mainPage').classList.add('hidden');
-            document.getElementById('gardenPage').classList.add('hidden');
-            document.getElementById(p).classList.remove('hidden');
-        }
-
         function openCatalog() {
-            let h = '<h2>Каталог</h2>';
+            let h = '<h3>Академия</h3>';
             plants.forEach((p, i) => {
                 const isU = gameData.unlocked.includes(i);
                 h += `<div class="item-row" onclick="showPlantInfo(${i})">
@@ -210,32 +196,18 @@
         function showPlantInfo(idx) {
             const p = plants[idx];
             if(gameData.unlocked.includes(idx)) {
-                document.getElementById('modalContent').innerHTML = `<h3>${p.name}</h3><div class="theory-box">${p.info}</div><button class="btn btn-green" onclick="openCatalog()">Назад</button>`;
+                document.getElementById('modalContent').innerHTML = `<h3>${p.name}</h3><p>${p.info}</p><button class="btn btn-green" onclick="openCatalog()">Назад</button>`;
             } else {
-                document.getElementById('modalContent').innerHTML = `<h3>${p.name}</h3><button class="btn btn-green" onclick="payAndStart(${idx})">Тест (💰${p.testCost})</button>`;
+                document.getElementById('modalContent').innerHTML = `<h3>${p.name}</h3><button class="btn btn-green" onclick="unlockPlant(${idx})">Купить за 💰${p.testCost}</button>`;
             }
         }
 
-        function payAndStart(idx) {
-            if(gameData.score < plants[idx].testCost) return alert("Мало денег!");
-            gameData.score -= plants[idx].testCost; testStep = 0; scoreInTest = 0; renderQuiz(idx);
-        }
-
-        function renderQuiz(idx) {
-            const q = plants[idx].questions[testStep];
-            let opts = q.o.map((txt, i) => `<div class="quiz-opt" onclick="ansQuiz(${idx}, ${i})">${txt}</div>`).join('');
-            document.getElementById('modalContent').innerHTML = `<h3>Вопрос ${testStep+1}</h3><p>${q.q}</p>${opts}`;
-        }
-
-        function ansQuiz(idx, ans) {
-            if(ans === plants[idx].questions[testStep].a) scoreInTest += 50;
-            testStep++;
-            if(testStep < plants[idx].questions.length) renderQuiz(idx);
-            else {
-                if(scoreInTest >= 80) { gameData.unlocked.push(idx); alert("Сдано!"); }
-                else alert("Провал!");
+        function unlockPlant(idx) {
+            if(gameData.score >= plants[idx].testCost) {
+                gameData.score -= plants[idx].testCost;
+                gameData.unlocked.push(idx);
                 save(); openCatalog();
-            }
+            } else alert("Недостаточно монет!");
         }
 
         function setTool(t) {
@@ -269,7 +241,7 @@
                     const info = plants.find(x => x.id === p.id);
                     g.innerHTML += `<div class="garden-slot" onclick="handleSlot(${i})">
                         <div class="plant-card">
-                            <span style="font-size:3rem;">${info.icon}</span>
+                            <span style="font-size:2.5rem;">${info.icon}</span>
                             <div class="bar"><div class="fill" style="width:${p.w}%; background:#2196f3"></div></div>
                             <div class="bar"><div class="fill" style="width:${p.h}%; background:#4caf50"></div></div>
                         </div>
@@ -279,19 +251,19 @@
         }
 
         function closeM() { document.getElementById('modalOverlay').classList.remove('active'); }
-
-        window.onload = () => {
-            const s = localStorage.getItem('oasis_font_size');
-            if(s) document.documentElement.style.setProperty('--base-font', s + 'px');
-        };
+        function showPage(p) {
+            document.getElementById('mainPage').classList.add('hidden');
+            document.getElementById('gardenPage').classList.add('hidden');
+            document.getElementById(p).classList.remove('hidden');
+        }
 
         setInterval(() => {
             if(!currentUser) return;
             gameData.garden.forEach(p => {
                 if(p) {
-                    p.w = Math.max(p.w - 1, 0); 
-                    if(p.w < 20) p.h = Math.max(p.h - 1, 0); 
-                    if(p.h > 40) gameData.score += plants.find(x => x.id === p.id).price / 10;
+                    p.w = Math.max(p.w - 0.5, 0); 
+                    if(p.w < 20) p.h = Math.max(p.h - 0.5, 0); 
+                    if(p.h > 40) gameData.score += plants.find(x => x.id === p.id).price / 20;
                 }
             });
             document.getElementById('scoreDisplay').innerText = `💰 ${Math.floor(gameData.score)}`;
@@ -300,3 +272,5 @@
     </script>
 </body>
 </html>
+</html>
+
