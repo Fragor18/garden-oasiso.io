@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Зеленый Оазис — Full Hack Edition</title>
+    <title>OASIS — Console & Shop Fix</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800&family=Ubuntu:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root { 
@@ -25,7 +25,7 @@
             background-size: cover; background-position: center;
         }
 
-        /* Слои входа */
+        /* Экраны входа */
         #authLayer, #deviceLayer { 
             position: fixed; inset: 0; z-index: 2000; 
             background: rgba(0,0,0,0.98); 
@@ -45,12 +45,12 @@
 
         /* Сад */
         .garden-container { width: 100%; height: 100%; overflow-y: auto; display: flex; justify-content: center; padding: 10px; }
-        .garden-grid { display: grid; gap: 10px; height: max-content; padding-bottom: 50px; }
+        .garden-grid { display: grid; gap: 10px; height: max-content; padding-bottom: 80px; }
         
         .is-pc .garden-grid { grid-template-columns: repeat(4, 160px); }
         .is-mobile .garden-grid { grid-template-columns: repeat(2, 1fr); width: 100%; max-width: 360px; }
 
-        .garden-slot { aspect-ratio: 4/5; background: rgba(255,255,255,0.05); border: 2px dashed rgba(255,255,255,0.2); border-radius: 20px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; }
+        .garden-slot { aspect-ratio: 4/5; background: rgba(255,255,255,0.05); border: 2px dashed rgba(255,255,255,0.2); border-radius: 20px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
         
         .plant-card { width: 100%; height: 100%; background: var(--card-bg); color: #333; border-radius: 18px; padding: 8px; display: flex; flex-direction: column; align-items: center; position: relative; }
         
@@ -75,21 +75,21 @@
         .modal { background: white; color: #333; width: 100%; max-width: 380px; padding: 20px; border-radius: 25px; text-align: center; }
         .item-row { display: flex; justify-content: space-between; align-items: center; padding: 12px; background: #f0f7f0; margin: 8px 0; border-radius: 12px; cursor: pointer; border: 1px solid #ddd; }
 
-        /* КНОПКА КОНСОЛИ */
+        /* КРАСНАЯ КНОПКА КОНСОЛИ */
         .cheat-btn { 
             position: fixed; 
-            bottom: 5px; 
-            right: 5px; 
-            opacity: 0.2; 
-            background: rgba(255,255,255,0.1); 
-            color: #555; 
-            border: none; 
-            width: 30px;
-            height: 30px;
-            border-radius: 5px;
+            bottom: 10px; 
+            right: 10px; 
+            background: #ff4444; 
+            color: white; 
+            border: 2px solid white; 
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
             z-index: 10000;
             cursor: pointer; 
-            font-size: 10px;
+            font-weight: bold;
+            box-shadow: 0 0 10px rgba(255,0,0,0.5);
         }
     </style>
 </head>
@@ -109,7 +109,7 @@
 
     <div id="deviceLayer" class="hidden">
         <div class="card">
-            <h3>Режим интерфейса</h3>
+            <h3>Режим устройства</h3>
             <button class="btn btn-green" style="width:100%; margin-bottom:10px" onclick="setDevice('pc')">Компьютер 💻</button>
             <button class="btn btn-green" style="width:100%" onclick="setDevice('mobile')">Телефон 📱</button>
         </div>
@@ -132,7 +132,7 @@
         <div id="mainPage" class="layer">
             <h1 style="color:var(--light-green); font-family:Montserrat">АКАДЕМИЯ</h1>
             <div style="display:flex; flex-direction:column; gap:10px; width:220px">
-                <button class="btn btn-green" onclick="openCatalog()">📚 Изучить Растения</button>
+                <button class="btn btn-green" onclick="openCatalog()">📚 Магазин семян</button>
                 <button class="btn btn-green" style="background:#f39c12" onclick="openLeaderboard()">🏆 Лидеры</button>
             </div>
         </div>
@@ -160,35 +160,25 @@
 
     <script>
         const plants = [
-            { id: 0, name: 'Монстера', icon: '🌿', income: 1.5, testCost: 0 },
-            { id: 1, name: 'Кактус', icon: '🌵', income: 8, testCost: 600 },
-            { id: 2, name: 'Мухоловка', icon: '🪴', income: 40, testCost: 4000 },
-            { id: 3, name: 'Бамбук', icon: '🎋', income: 180, testCost: 20000 },
-            { id: 4, name: 'Оазис', icon: '💎', income: 1500, testCost: 100000 }
+            { id: 0, name: 'Монстера', icon: '🌿', income: 2, testCost: 0 },
+            { id: 1, name: 'Кактус', icon: '🌵', income: 10, testCost: 600 },
+            { id: 2, name: 'Мухоловка', icon: '🪴', income: 50, testCost: 4500 },
+            { id: 3, name: 'Бамбук', icon: '🎋', income: 200, testCost: 25000 },
+            { id: 4, name: 'Оазис', icon: '💎', income: 1800, testCost: 120000 }
         ];
 
         let currentUser = null;
         let gameData = { score: 0, unlocked: [0], garden: new Array(12).fill(null) };
         let currentTool = 'water';
         let cooldowns = { water: false, food: false };
-        const STORAGE_KEY = 'oasis_eco_v25';
+        const STORAGE_KEY = 'oasis_final_v30';
 
-        // --- ФУНКЦИЯ КОНСОЛИ ---
         function openConsole() {
-            let code = prompt("Введите чит-код:");
+            let code = prompt("Введите чит-код (money / unlock / clear):");
             if(!code) return;
-            if(code === 'money') {
-                gameData.score += 500000;
-                alert("Получено 💰500,000!");
-            } else if(code === 'unlock') {
-                gameData.unlocked = [0,1,2,3,4];
-                alert("Все растения открыты!");
-            } else if(code === 'clear') {
-                gameData.garden = new Array(12).fill(null);
-                alert("Сад очищен.");
-            } else {
-                alert("Неизвестный код.");
-            }
+            if(code === 'money') gameData.score += 1000000;
+            if(code === 'unlock') gameData.unlocked = [0,1,2,3,4];
+            if(code === 'clear') gameData.garden = new Array(12).fill(null);
             save(); renderGarden();
         }
 
@@ -198,7 +188,7 @@
             if(!name || !pass) return;
             let users = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
             if(users[name]) {
-                if(users[name].pass !== pass) return alert("Пароль!");
+                if(users[name].pass !== pass) return alert("Неверный пароль!");
                 gameData = users[name].data;
             } else {
                 users[name] = { pass, data: { score: 0, unlocked: [0], garden: new Array(12).fill(null) } };
@@ -236,22 +226,21 @@
 
         function handleSlot(i) {
             if(!gameData.garden[i]) {
-                let h = '<h3>Посадить:</h3>';
-                plants.filter((_, idx) => gameData.unlocked.includes(idx)).forEach(p => {
-                    h += `<div class="item-row" onclick="plantNow(${i}, ${p.id})">${p.icon} ${p.name}</div>`;
+                let h = '<h3>Посадить растение:</h3>';
+                plants.forEach((p, idx) => {
+                    if(gameData.unlocked.includes(idx)) {
+                        h += `<div class="item-row" onclick="plantNow(${i}, ${p.id})">
+                                <span>${p.icon} ${p.name}</span>
+                                <span style="color:green">Доступно</span>
+                              </div>`;
+                    }
                 });
-                document.getElementById('modalContent').innerHTML = h + `<button class="btn" onclick="closeM()">Закрыть</button>`;
+                document.getElementById('modalContent').innerHTML = h + `<button class="btn" style="width:100%; margin-top:10px" onclick="closeM()">Закрыть</button>`;
                 document.getElementById('modalOverlay').classList.add('active');
             } else {
                 let p = gameData.garden[i];
-                if(currentTool === 'water' && !cooldowns.water) {
-                    p.w = Math.min(p.w + 40, 100);
-                    triggerCooldown('water', 1200); 
-                }
-                if(currentTool === 'food' && !cooldowns.food) {
-                    p.h = Math.min(p.h + 30, 100);
-                    triggerCooldown('food', 2500); 
-                }
+                if(currentTool === 'water' && !cooldowns.water) { p.w = Math.min(p.w + 40, 100); triggerCooldown('water', 1200); }
+                if(currentTool === 'food' && !cooldowns.food) { p.h = Math.min(p.h + 30, 100); triggerCooldown('food', 2500); }
                 if(currentTool === 'trash') gameData.garden[i] = null;
                 save(); renderGarden();
             }
@@ -264,9 +253,8 @@
             g.innerHTML = gameData.garden.map((p, i) => {
                 if(!p) return `<div class="garden-slot" onclick="handleSlot(${i})">➕</div>`;
                 const info = plants.find(x => x.id === p.id);
-                const isEarning = p.h > 40;
                 return `<div class="garden-slot" onclick="handleSlot(${i})">
-                    <div class="plant-card ${isEarning ? 'earning' : ''}">
+                    <div class="plant-card ${p.h > 40 ? 'earning' : ''}">
                         <div class="plant-icon">${info.icon}</div>
                         <div class="bars-container">
                             <div class="bar"><div class="fill" style="width:${p.w}%; background:#2196f3"></div></div>
@@ -278,31 +266,38 @@
         }
 
         function openCatalog() {
-            let h = '<h3>Магазин семян</h3>';
+            let h = '<h3>Академия Оазиса</h3>';
             plants.forEach((p, i) => {
                 const isU = gameData.unlocked.includes(i);
                 const prevU = (i === 0) || gameData.unlocked.includes(i - 1);
-                if(prevU) {
-                    h += `<div class="item-row" onclick="${isU ? '' : 'unlockP('+i+')'}">
-                        <span>${p.icon} ${p.name}</span>
-                        <span>${isU ? '✅' : '💰'+p.testCost}</span>
-                    </div>`;
-                } else h += `<div class="item-row" style="opacity:0.4"><span>🔒 Заблокировано</span></div>`;
+                
+                if(isU) {
+                    h += `<div class="item-row"><span>${p.icon} ${p.name}</span><span style="color:green">Изучено ✅</span></div>`;
+                } else if(prevU) {
+                    h += `<div class="item-row" onclick="unlockP(${i})">
+                            <span>${p.icon} ${p.name}</span>
+                            <span style="font-weight:bold">💰 ${p.testCost}</span>
+                          </div>`;
+                } else {
+                    h += `<div class="item-row" style="opacity:0.4"><span>🔒 Заблокировано</span></div>`;
+                }
             });
-            document.getElementById('modalContent').innerHTML = h + `<button class="btn" style="width:100%;margin-top:10px" onclick="closeM()">Назад</button>`;
+            document.getElementById('modalContent').innerHTML = h + `<button class="btn btn-green" style="width:100%;margin-top:10px" onclick="closeM()">Назад</button>`;
             document.getElementById('modalOverlay').classList.add('active');
         }
 
         function unlockP(idx) {
             if(gameData.score >= plants[idx].testCost) {
-                gameData.score -= plants[idx].testCost; gameData.unlocked.push(idx); save(); openCatalog();
-            } else alert("Мало монет!");
+                gameData.score -= plants[idx].testCost;
+                gameData.unlocked.push(idx);
+                save(); openCatalog();
+            } else alert("Недостаточно монет!");
         }
 
         function openLeaderboard() {
             let users = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
             let list = Object.keys(users).map(n => ({ n, s: Math.floor(users[n].data.score) })).sort((a,b)=>b.s-a.s);
-            let h = '<h3>Топ</h3>';
+            let h = '<h3>Лидеры</h3>';
             list.slice(0, 10).forEach((u,i) => h += `<div class="item-row"><span>${i+1}. ${u.n}</span><span>💰 ${u.s}</span></div>`);
             document.getElementById('modalContent').innerHTML = h + `<button class="btn" onclick="closeM()">Закрыть</button>`;
             document.getElementById('modalOverlay').classList.add('active');
@@ -328,8 +323,8 @@
             let totalIncome = 0;
             gameData.garden.forEach(p => {
                 if(p) {
-                    p.w = Math.max(p.w - 0.6, 0); 
-                    if(p.w < 25) p.h = Math.max(p.h - 1.0, 0); 
+                    p.w = Math.max(p.w - 0.7, 0); 
+                    if(p.w < 25) p.h = Math.max(p.h - 1.2, 0); 
                     if(p.h > 40) totalIncome += plants.find(x => x.id === p.id).income;
                 }
             });
