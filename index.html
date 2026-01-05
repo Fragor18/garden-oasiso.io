@@ -3,289 +3,321 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>OASIS 2026 — Welcome</title>
+    <title>OASIS 2026 — Age Update</title>
     <style>
         :root { 
             --p: #2e7d32; --bg: #000; 
             --sky-day: #4facfe; --sky-night: #0a0f1e;
             --r0: #2ecc71; --r1: #3498db; --r2: #9b59b6; --r3: #f1c40f; --r4: #e74c3c;
         }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
         body { margin: 0; font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; height: 100vh; overflow: hidden; }
+        
         #sky { position: fixed; inset: 0; z-index: -1; transition: 3s; background: var(--sky-day); }
 
-        /* ЭКРАН ПРИВЕТСТВИЯ / АВТОРИЗАЦИЯ */
-        .full-screen { position: fixed; inset: 0; z-index: 5000; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; }
-        .welcome-title { font-size: 3rem; margin-bottom: 10px; color: var(--p); text-shadow: 0 0 15px var(--p); }
-        .auth-card { background: white; color: #333; padding: 30px; border-radius: 25px; width: 100%; max-width: 350px; }
-        .auth-card input { width: 100%; padding: 15px; margin: 10px 0; border-radius: 12px; border: 1px solid #ddd; font-size: 16px; outline: none; }
-        
-        /* ИГРОВОЙ ИНТЕРФЕЙС */
-        .header { background: rgba(0,0,0,0.85); padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--p); z-index: 10; position: relative; }
-        .score { font-size: 1.2rem; font-weight: bold; color: #4caf50; }
+        /* МЕНЮ */
+        #startMenu { position: fixed; inset: 0; z-index: 9999; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .logo { font-size: 3.5rem; font-weight: 900; color: var(--p); text-shadow: 0 0 20px var(--p); letter-spacing: 5px; margin-bottom: 30px; }
+        .auth-box { width: 85%; max-width: 320px; }
+        .auth-box input { width: 100%; padding: 15px; margin-bottom: 10px; border-radius: 12px; border: none; background: #222; color: white; font-size: 16px; }
 
-        .main-container { height: calc(100vh - 140px); overflow-y: auto; padding: 8px; display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; align-content: start; z-index: 5; position: relative; }
+        /* ИНТЕРФЕЙС */
+        .game-ui { display: none; height: 100vh; flex-direction: column; }
+        .header { background: rgba(0,0,0,0.85); padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--p); }
+        .score { font-size: 1.1rem; color: #4caf50; font-weight: bold; }
+
+        /* САД */
+        .garden { flex: 1; display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; padding: 10px; align-content: start; overflow-y: auto; }
+        .slot { aspect-ratio: 1/1.3; background: rgba(255,255,255,0.05); border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; position: relative; }
+        .slot.locked { background: rgba(0,0,0,0.4); color: #444; font-size: 9px; text-align: center; }
         
-        /* ГРЯДКА 5x5 */
-        .slot { aspect-ratio: 1/1.2; background: rgba(255,255,255,0.1); border: 1px dashed rgba(255,255,255,0.2); border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; font-size: 11px; }
-        .slot.locked { background: rgba(0,0,0,0.7); color: #444; }
+        .plant { width: 95%; height: 95%; background: white; border-radius: 8px; border-top: 4px solid #ccc; display: flex; flex-direction: column; align-items: center; justify-content: space-evenly; padding: 2px; }
+        .bar { width: 85%; height: 3px; background: #eee; border-radius: 2px; overflow: hidden; margin: 1px 0; }
+        .fill { height: 100%; transition: 0.3s; }
+
+        /* ОКНА */
+        .overlay { position: fixed; inset: 0; background: #000; z-index: 8000; display: none; flex-direction: column; padding: 20px; }
+        .m-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 500px; align-self: center; }
         
-        .plant { background: white; color: #333; width: 95%; height: 95%; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: space-around; padding: 4px; border-top: 4px solid #ccc; position: relative; }
+        .m-card { background: white; color: #333; padding: 15px; border-radius: 20px; display: flex; align-items: center; gap: 15px; border-left: 10px solid #ccc; transition: 0.3s; position: relative; }
+        .m-card.locked { background: #1a1a1a; color: #444; border-color: #333 !important; }
+        .m-card.bought { transform: scale(0.9); opacity: 0; pointer-events: none; }
+        .m-card .icon { font-size: 3rem; }
+        .m-card .info { flex: 1; }
+        .buy-btn { background: var(--p); color: white; border: none; padding: 12px 18px; border-radius: 12px; font-weight: bold; min-width: 90px; }
+        .buy-btn.success { background: #2ecc71 !important; }
+
+        /* ТУЛБАР */
+        .toolbar { padding: 15px; background: #111; display: flex; justify-content: center; gap: 15px; border-top: 1px solid var(--p); }
+        .tool { width: 60px; height: 60px; background: #222; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; position: relative; overflow: hidden; border: 2px solid transparent; }
+        .tool.active { border-color: #4caf50; }
+        .tool.cooldown::after { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; background: rgba(76, 175, 80, 0.4); animation: cd 1.5s linear forwards; }
         
+        @keyframes cd { from { height: 100%; } to { height: 0%; } }
+
+        .btn { padding: 10px 15px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; font-size: 14px; }
+        .btn-p { background: var(--p); color: white; width: 100%; margin-top: 10px; padding: 15px; }
+        
+        /* РЕДКОСТЬ */
         .rarity-0 { border-color: var(--r0) !important; }
         .rarity-1 { border-color: var(--r1) !important; }
         .rarity-2 { border-color: var(--r2) !important; }
         .rarity-3 { border-color: var(--r3) !important; }
-        .rarity-4 { border-color: var(--r4) !important; animation: glow 1s infinite alternate; }
-        @keyframes glow { from { box-shadow: 0 0 2px var(--r4); } to { box-shadow: 0 0 10px var(--r4); } }
-
-        .bar { width: 90%; height: 4px; background: #eee; border-radius: 2px; overflow: hidden; }
-        .fill { height: 100%; transition: 0.3s; }
-
-        /* УЛУЧШЕННЫЙ МАГАЗИН */
-        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 6000; display: none; flex-direction: column; align-items: center; padding: 25px; overflow-y: auto; }
-        .m-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%; max-width: 450px; margin-top: 20px; }
-        .m-item { background: white; color: #333; padding: 15px; border-radius: 18px; text-align: center; border: none; font-weight: bold; border-top: 6px solid #ccc; }
-        .m-item .icon { font-size: 2.5rem; margin-bottom: 5px; display: block; }
-
-        .toolbar { position: fixed; bottom: 0; width: 100%; background: #111; padding: 12px; display: flex; justify-content: center; gap: 20px; border-top: 2px solid var(--p); z-index: 10; }
-        .tool { font-size: 1.6rem; padding: 10px; background: #222; border-radius: 12px; cursor: pointer; opacity: 0.3; transition: 0.2s; }
-        .tool.active { opacity: 1; border: 2px solid #4caf50; transform: scale(1.1); }
-
-        .btn { background: var(--p); color: white; border: none; padding: 12px 20px; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 16px; transition: 0.2s; }
-        .btn:active { transform: scale(0.95); }
-        .btn-buy { background: var(--p); color: white; border: none; padding: 10px; width: 100%; border-radius: 10px; margin-top: 10px; font-size: 14px; font-weight: bold; }
-        
-        .hidden { display: none !important; }
+        .rarity-4 { border-color: var(--r4) !important; box-shadow: 0 0 10px rgba(231, 76, 60, 0.3); }
     </style>
 </head>
 <body>
+
     <div id="sky"></div>
 
-    <div id="welcomeScreen" class="full-screen">
-        <h1 class="welcome-title">OASIS</h1>
-        <p style="color: #aaa; margin-bottom: 30px;">Твой цифровой сад будущего</p>
-        <div class="auth-card">
-            <input type="text" id="userLogin" placeholder="Имя садовода">
-            <input type="password" id="userPass" placeholder="Пароль">
-            <div style="display:flex; gap:10px; margin-top:10px">
-                <button class="btn" style="flex:1" onclick="handleAuth(true)">ВОЙТИ</button>
-                <button class="btn" style="flex:1; background:#555" onclick="handleAuth(false)">СОЗДАТЬ</button>
-            </div>
-            <p id="authMsg" style="font-size:13px; color:red; margin-top:15px; min-height: 20px;"></p>
+    <div id="startMenu">
+        <div class="logo">OASIS</div>
+        <div class="auth-box">
+            <input type="text" id="loginInp" placeholder="Твой ник">
+            <input type="password" id="passInp" placeholder="Пароль">
+            <button class="btn btn-p" onclick="auth(true)">ИГРАТЬ</button>
+            <button class="btn" style="background:none; color:#555; width:100%; margin-top:10px" onclick="auth(false)">РЕГИСТРАЦИЯ</button>
+            <p id="msg" style="font-size:12px; color:#e74c3c; text-align:center; margin-top:10px"></p>
         </div>
     </div>
 
-    <div id="gameUI" class="hidden">
+    <div id="gameUI" class="game-ui">
         <div class="header">
             <div class="score" id="score">💰 150</div>
-            <div id="status">☀️ ☁️</div>
-            <button class="btn" style="padding: 8px 15px;" onclick="toggleOverlay('marketOverlay', true)">🛒 РЫНОК</button>
+            <div style="display:flex; gap:5px">
+                <button class="btn" style="background:#444" onclick="openAtlas()">📖 АТЛАС</button>
+                <button class="btn" style="background:var(--p)" onclick="openMarket()">🛒 РЫНОК</button>
+            </div>
         </div>
-        <div class="main-container" id="garden"></div>
+        <div class="garden" id="garden"></div>
         <div class="toolbar">
-            <div class="tool active" id="t-water" onclick="setTool('water')">💧</div>
-            <div class="tool" id="t-food" onclick="setTool('food')">🧪</div>
-            <div class="tool" id="t-trash" onclick="setTool('trash')">🗑️</div>
-            <button onclick="location.reload()" style="background:none; border:none; color:#444; font-size:10px;">ВЫЙТИ</button>
+            <div class="tool active" id="tool-water" onclick="setTool('water')">💧</div>
+            <div class="tool" id="tool-food" onclick="setTool('food')">🧪</div>
+            <div class="tool" id="tool-trash" onclick="setTool('trash')">🗑️</div>
         </div>
     </div>
 
-    <div class="overlay" id="marketOverlay">
-        <h2 style="margin:0">МАГАЗИН СЕМЯН</h2>
-        <p id="mTimer" style="font-size: 14px; color: #888; margin-bottom: 10px;">Обновление: 05:00</p>
-        <div class="m-grid" id="marketGrid"></div>
-        <button class="btn" style="margin-top: 30px; background: #7d2e2e; width: 200px;" onclick="toggleOverlay('marketOverlay', false)">ЗАКРЫТЬ</button>
+    <div id="marketOverlay" class="overlay">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px">
+            <h2 style="margin:0">РЫНОК</h2>
+            <button class="btn" style="background:#444" onclick="closeOverlay('marketOverlay')">ЗАКРЫТЬ</button>
+        </div>
+        <p id="mTimer" style="color:#666; margin-top:-15px; margin-bottom:15px; font-size:13px">Обновление: 05:00</p>
+        <div class="m-list" id="marketList"></div>
     </div>
 
-    <div class="overlay" id="plantOverlay">
-        <h2>МОИ СЕМЕНА</h2>
-        <div class="m-grid" id="inventoryGrid"></div>
-        <button class="btn" style="margin-top: 30px; background: #7d2e2e; width: 200px;" onclick="toggleOverlay('plantOverlay', false)">ОТМЕНА</button>
+    <div id="bagOverlay" class="overlay">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px">
+            <h2 style="margin:0">СУМКА</h2>
+            <button class="btn" style="background:#444" onclick="closeOverlay('bagOverlay')">ЗАКРЫТЬ</button>
+        </div>
+        <div class="m-list" id="bagList"></div>
+    </div>
+
+    <div id="atlasOverlay" class="overlay">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px">
+            <h2 style="margin:0">АТЛАС</h2>
+            <button class="btn" style="background:#444" onclick="closeOverlay('atlasOverlay')">ЗАКРЫТЬ</button>
+        </div>
+        <div class="m-list" id="atlasList"></div>
     </div>
 
     <script>
+        // Добавлено свойство life (макс. время жизни в секундах)
         const FLORA = [
-            { id: 0, n: 'Трава', i: '🌱', inc: 1, c: 20, r: 1.0, rar: 0 },
-            { id: 1, n: 'Ромашка', i: '🌼', inc: 4, c: 120, r: 0.8, rar: 0 },
-            { id: 2, n: 'Мята', i: '🌿', inc: 10, c: 350, r: 0.8, rar: 0 },
-            { id: 3, n: 'Кактус', i: '🌵', inc: 30, c: 1500, r: 0.6, rar: 1 },
-            { id: 4, n: 'Тюльпан', i: '🌷', inc: 65, c: 4000, r: 0.6, rar: 1 },
-            { id: 5, n: 'Подсолнух', i: '🌻', inc: 200, c: 18000, r: 0.5, rar: 1 },
-            { id: 6, n: 'Роза', i: '🌹', inc: 500, c: 50000, r: 0.4, rar: 2 },
-            { id: 7, n: 'Лаванда', i: '⚛️', inc: 900, c: 100000, r: 0.4, rar: 2 },
-            { id: 8, n: 'Лилия', i: '🪷', inc: 1600, c: 200000, r: 0.3, rar: 2 },
-            { id: 9, n: 'Пальма', i: '🌴', inc: 4000, c: 500000, r: 0.3, rar: 2 },
-            { id: 10, n: 'Бамбук', i: '🎋', inc: 10000, c: 1500000, r: 0.2, rar: 3 },
-            { id: 11, n: 'Ель', i: '🌲', inc: 25000, c: 4000000, r: 0.2, rar: 3 },
-            { id: 12, n: 'Мухоловка', i: '🪴', inc: 60000, c: 10000000, r: 0.15, rar: 3 },
-            { id: 13, n: 'Гриб', i: '🍄', inc: 150000, c: 25000000, r: 0.1, rar: 3 },
-            { id: 14, n: 'Вишня', i: '🍒', inc: 400000, c: 80000000, r: 0.08, rar: 4 },
-            { id: 15, n: 'Орех', i: '🌰', inc: 1000000, c: 250000000, r: 0.06, rar: 4 },
-            { id: 16, n: 'Лотос', i: '💮', inc: 2500000, c: 800000000, r: 0.04, rar: 4 },
-            { id: 17, n: 'Арбуз', i: '🍉', inc: 8000000, c: 3000000000, r: 0.03, rar: 4 },
-            { id: 18, n: 'Дракон', i: '🐉', inc: 25000000, c: 12000000000, r: 0.02, rar: 4 },
-            { id: 19, n: 'Звезда', i: '✨', inc: 80000000, c: 40000000000, r: 0.01, rar: 4 }
+            { id: 0, n: 'Трава', i: '🌱', inc: 1, c: 20, r: 1.0, rar: 0, life: 60 },
+            { id: 1, n: 'Ромашка', i: '🌼', inc: 6, c: 200, r: 0.8, rar: 0, life: 90 },
+            { id: 2, n: 'Мята', i: '🌿', inc: 15, c: 600, r: 0.8, rar: 0, life: 120 },
+            { id: 3, n: 'Кактус', i: '🌵', inc: 45, c: 2500, r: 0.6, rar: 1, life: 200 },
+            { id: 4, n: 'Тюльпан', i: '🌷', inc: 100, c: 6000, r: 0.6, rar: 1, life: 150 },
+            { id: 5, n: 'Подсолнух', i: '🌻', inc: 300, c: 30000, r: 0.5, rar: 1, life: 180 },
+            { id: 6, n: 'Роза', i: '🌹', inc: 700, c: 90000, r: 0.4, rar: 2, life: 240 },
+            { id: 7, n: 'Пальма', i: '🌴', inc: 6000, c: 800000, r: 0.3, rar: 2, life: 500 },
+            { id: 8, n: 'Бамбук', i: '🎋', inc: 20000, c: 3500000, r: 0.2, rar: 3, life: 400 },
+            { id: 9, n: 'Ель', i: '🌲', inc: 50000, c: 10000000, r: 0.2, rar: 3, life: 600 },
+            { id: 10, n: 'Звезда', i: '✨', inc: 200000000, c: 80000000000, r: 0.01, rar: 4, life: 1000 }
         ];
 
         let currentUser = null;
-        let gameData = { score: 150, slots: 5, garden: new Array(25).fill(null), inventory: [0] };
-        let marketItems = [];
-        let marketTimer = 300;
-        let currentTool = 'water';
-        let activeSlotIdx = null;
+        let gameData = { score: 150, slots: 5, garden: new Array(25).fill(null), inventory: [0], unlocked: [0] };
+        let currentTool = 'water', toolCD = false, marketItems = [], marketTimer = 300;
 
-        function handleAuth(isLogin) {
-            const login = document.getElementById('userLogin').value.trim().toLowerCase();
-            const pass = document.getElementById('userPass').value.trim();
-            const msg = document.getElementById('authMsg');
-            if(!login || !pass) return msg.innerText = "Введите логин и пароль!";
-            let users = JSON.parse(localStorage.getItem('oasis_users_v2') || '{}');
+        function auth(isLogin) {
+            const login = document.getElementById('loginInp').value.trim().toLowerCase();
+            const pass = document.getElementById('passInp').value;
+            const msg = document.getElementById('msg');
+            if(!login || !pass) return msg.innerText = "Заполни поля!";
+            let users = JSON.parse(localStorage.getItem('oasis_v6') || '{}');
             if(isLogin) {
-                if(users[login] && users[login].pass === pass) { currentUser = login; gameData = users[login].data; startGame(); }
-                else { msg.innerText = "Ошибка входа!"; }
+                if(users[login] && users[login].pass === pass) {
+                    currentUser = login; gameData = users[login].data;
+                    document.getElementById('startMenu').style.display = 'none';
+                    document.getElementById('gameUI').style.display = 'flex';
+                    startGame();
+                } else msg.innerText = "Ошибка!";
             } else {
-                if(users[login]) { msg.innerText = "Логин занят!"; }
-                else { users[login] = { pass, data: { score: 150, slots: 5, garden: new Array(25).fill(null), inventory: [0] } }; localStorage.setItem('oasis_users_v2', JSON.stringify(users)); msg.style.color = "green"; msg.innerText = "Аккаунт создан! Войдите."; }
+                if(users[login]) msg.innerText = "Занято!";
+                else {
+                    users[login] = { pass, data: { score: 150, slots: 5, garden: new Array(25).fill(null), inventory: [0], unlocked: [0] } };
+                    localStorage.setItem('oasis_v6', JSON.stringify(users));
+                    msg.style.color = "green"; msg.innerText = "ОК! Войдите.";
+                }
             }
         }
 
         function save() {
             if(!currentUser) return;
-            let users = JSON.parse(localStorage.getItem('oasis_users_v2') || '{}');
+            let users = JSON.parse(localStorage.getItem('oasis_v6') || '{}');
             users[currentUser].data = gameData;
-            localStorage.setItem('oasis_users_v2', JSON.stringify(users));
+            localStorage.setItem('oasis_v6', JSON.stringify(users));
         }
 
-        function startGame() {
-            document.getElementById('welcomeScreen').classList.add('hidden');
-            document.getElementById('gameUI').classList.remove('hidden');
-            refreshMarket();
-            renderGarden();
-        }
+        function startGame() { refreshMarket(); renderGarden(); setInterval(tick, 1000); }
 
         function renderGarden() {
-            const g = document.getElementById('garden');
-            g.innerHTML = '';
+            const g = document.getElementById('garden'); g.innerHTML = '';
             for(let i=0; i<25; i++) {
-                let p = gameData.garden[i];
-                let locked = i >= gameData.slots;
-                let div = document.createElement('div');
+                let p = gameData.garden[i], locked = i >= gameData.slots, div = document.createElement('div');
                 div.className = 'slot' + (locked ? ' locked' : '');
                 if(locked) {
                     let cost = gameData.slots * 5000;
                     div.innerHTML = `🔒<br>${cost}`;
                     div.onclick = () => { if(gameData.score >= cost) { gameData.score -= cost; gameData.slots++; renderGarden(); save(); } };
                 } else if(!p) {
-                    div.innerHTML = '➕';
-                    div.onclick = () => { activeSlotIdx = i; openPlantMenu(); };
+                    div.innerHTML = '+';
+                    div.onclick = () => openBag(i);
                 } else {
                     let info = FLORA[p.id];
+                    let agePerc = ((info.life - p.age) / info.life) * 100;
                     div.innerHTML = `<div class="plant rarity-${info.rar}">
-                        <div class="icon" style="font-size:1.8rem">${info.i}</div>
-                        <div class="bar"><div class="fill" style="width:${p.w}%; background:#3b82f6"></div></div>
-                        <div class="bar"><div class="fill" style="width:${p.h}%; background:#22c55e"></div></div>
+                        <div style="font-size:1.6rem">${info.i}</div>
+                        <div class="bar" title="Вода"><div class="fill" style="width:${p.w}%; background:#3b82f6"></div></div>
+                        <div class="bar" title="Здоровье"><div class="fill" style="width:${p.h}%; background:#22c55e"></div></div>
+                        <div class="bar" title="Возраст"><div class="fill" style="width:${agePerc}%; background:#f1c40f"></div></div>
                     </div>`;
-                    div.onclick = () => {
-                        if(currentTool === 'water') p.w = Math.min(p.w + 40, 100);
-                        if(currentTool === 'food') p.h = Math.min(p.h + 25, 100);
-                        if(currentTool === 'trash') gameData.garden[i] = null;
-                        renderGarden(); save();
-                    };
+                    div.onclick = () => useTool(i);
                 }
                 g.appendChild(div);
             }
         }
 
-        function openPlantMenu() {
-            const grid = document.getElementById('inventoryGrid');
-            if(gameData.inventory.length === 0) return alert("Сначала купи семена в магазине!");
-            grid.innerHTML = gameData.inventory.map((id, idx) => {
-                let p = FLORA[id];
-                return `<button class="m-item rarity-${p.rar}" onclick="confirmPlant(${idx})"><span class="icon">${p.i}</span>${p.n}</button>`;
-            }).join('');
-            toggleOverlay('plantOverlay', true);
-        }
-
-        function confirmPlant(invIdx) {
-            let id = gameData.inventory.splice(invIdx, 1)[0];
-            gameData.garden[activeSlotIdx] = { id, w: 100, h: 100, age: 0 };
-            toggleOverlay('plantOverlay', false);
-            renderGarden(); save();
-        }
-
-        function refreshMarket() {
-            marketItems = [FLORA[0]]; // Первый слот — всегда Трава
-            for(let i=1; i<6; i++) {
-                let p = FLORA[Math.floor(Math.random() * FLORA.length)];
-                marketItems.push(Math.random() < p.r ? p : null);
-            }
-            renderMarketUI();
-        }
-
-        function renderMarketUI() {
-            const grid = document.getElementById('marketGrid');
-            grid.innerHTML = '';
-            marketItems.forEach((p, idx) => {
-                let div = document.createElement('div');
-                div.className = 'm-item' + (p ? ` rarity-${p.rar}` : ' empty');
-                if(!p) {
-                    div.innerHTML = 'ПУСТО';
-                } else {
-                    div.innerHTML = `<span class="icon">${p.i}</span><div>${p.n}</div>
-                    <button class="btn-buy" onclick="buySeed(${idx})">💰 ${p.c}</button>`;
-                }
-                grid.appendChild(div);
-            });
-        }
-
-        function buySeed(idx) {
-            let p = marketItems[idx];
-            if(!p) return;
-            if(gameData.score >= p.c) {
-                gameData.score -= p.c;
-                gameData.inventory.push(p.id);
-                // Если это не Трава в 1 слоте, убираем товар
-                if(idx !== 0) { marketItems[idx] = null; }
-                renderMarketUI();
-                document.getElementById('score').innerText = '💰 ' + Math.floor(gameData.score);
-                save();
-            } else {
-                alert("Недостаточно денег!");
-            }
-        }
-
-        function toggleOverlay(id, show) { document.getElementById(id).style.display = show ? 'flex' : 'none'; }
         function setTool(t) {
             currentTool = t;
             document.querySelectorAll('.tool').forEach(el => el.classList.remove('active'));
-            document.getElementById('t-'+t).classList.add('active');
+            document.getElementById('tool-'+t).classList.add('active');
         }
 
-        setInterval(() => {
+        function useTool(idx) {
+            if(toolCD) return;
+            let p = gameData.garden[idx];
+            if(currentTool === 'trash') { gameData.garden[idx] = null; renderGarden(); return; }
+            p[currentTool === 'water' ? 'w' : 'h'] = Math.min(p[currentTool === 'water' ? 'w' : 'h'] + 35, 100);
+            toolCD = true;
+            document.getElementById('tool-'+currentTool).classList.add('cooldown');
+            setTimeout(() => { toolCD = false; document.getElementById('tool-'+currentTool).classList.remove('cooldown'); }, 1500);
+            renderGarden(); save();
+        }
+
+        function openMarket() {
+            document.getElementById('marketOverlay').style.display = 'flex';
+            const list = document.getElementById('marketList'); list.innerHTML = '';
+            marketItems.forEach((p, idx) => {
+                if(!p) return;
+                let card = document.createElement('div');
+                card.className = `m-card rarity-${p.rar}`; card.id = `m-card-${idx}`;
+                card.innerHTML = `<div class="icon">${p.i}</div>
+                    <div class="info"><b>${p.n}</b><br><small>Доход: ${p.inc}/с</small></div>
+                    <button class="buy-btn" id="btn-${idx}" onclick="buy(${idx})">💰 ${p.c}</button>`;
+                list.appendChild(card);
+            });
+        }
+
+        function buy(idx) {
+            let p = marketItems[idx], btn = document.getElementById(`btn-${idx}`), card = document.getElementById(`m-card-${idx}`);
+            if(gameData.score >= p.c) {
+                gameData.score -= p.c;
+                gameData.inventory.push(p.id);
+                if(!gameData.unlocked.includes(p.id)) gameData.unlocked.push(p.id);
+                btn.innerText = "КУПЛЕНО!"; btn.classList.add('success');
+                setTimeout(() => {
+                    if(idx !== 0) { card.classList.add('bought'); setTimeout(() => { marketItems[idx] = null; openMarket(); }, 300); }
+                    else { btn.innerText = `💰 ${p.c}`; btn.classList.remove('success'); }
+                }, 500);
+                save();
+            } else { btn.innerText = "МАЛО 💰"; setTimeout(() => btn.innerText = `💰 ${p.c}`, 1000); }
+        }
+
+        function openAtlas() {
+            document.getElementById('atlasOverlay').style.display = 'flex';
+            const list = document.getElementById('atlasList'); list.innerHTML = '';
+            FLORA.forEach(p => {
+                let isOpen = gameData.unlocked.includes(p.id);
+                let card = document.createElement('div');
+                card.className = `m-card rarity-${p.rar} ${isOpen ? '' : ' locked'}`;
+                card.innerHTML = `<div class="icon">${isOpen ? p.i : '❓'}</div>
+                    <div class="info">
+                        <b>${isOpen ? p.n : '???'}</b><br>
+                        <small>${isOpen ? '💰: ' + p.inc + '/с | ⏳: ' + p.life + 'с' : 'Сначала купите это растение'}</small>
+                    </div>`;
+                list.appendChild(card);
+            });
+        }
+
+        function openBag(slotIdx) {
+            document.getElementById('bagOverlay').style.display = 'flex';
+            const list = document.getElementById('bagList'); list.innerHTML = '';
+            gameData.inventory.forEach((id, invIdx) => {
+                let p = FLORA[id], card = document.createElement('div');
+                card.className = `m-card rarity-${p.rar}`;
+                card.innerHTML = `<div class="icon">${p.i}</div>
+                    <div class="info"><b>${p.n}</b></div>
+                    <button class="buy-btn" onclick="plant(${invIdx}, ${slotIdx})">ПОСАДИТЬ</button>`;
+                list.appendChild(card);
+            });
+        }
+
+        function plant(invIdx, slotIdx) {
+            let id = gameData.inventory.splice(invIdx, 1)[0];
+            gameData.garden[slotIdx] = { id, w: 100, h: 100, age: 0 };
+            closeOverlay('bagOverlay'); renderGarden(); save();
+        }
+
+        function refreshMarket() {
+            marketItems = [FLORA[0]];
+            for(let i=1; i<6; i++) marketItems.push(FLORA[Math.floor(Math.random() * FLORA.length)]);
+            if(document.getElementById('marketOverlay').style.display === 'flex') openMarket();
+        }
+
+        function closeOverlay(id) { document.getElementById(id).style.display = 'none'; }
+
+        function tick() {
             if(!currentUser) return;
-            marketTimer--;
-            if(marketTimer <= 0) { marketTimer = 300; refreshMarket(); }
+            marketTimer--; if(marketTimer <= 0) { marketTimer = 300; refreshMarket(); }
             let m = Math.floor(marketTimer/60), s = marketTimer%60;
-            document.getElementById('mTimer').innerText = `Обновление: ${m}:${s<10?'0'+s:s}`;
-
-            let sec = new Date().getSeconds();
-            let night = sec >= 30;
+            document.getElementById('mTimer').innerText = `Обновление через: ${m}:${s<10?'0'+s:s}`;
+            let night = new Date().getSeconds() >= 30;
             document.getElementById('sky').style.background = night ? 'var(--sky-night)' : 'var(--sky-day)';
-            document.getElementById('status').innerText = night ? '🌙 ✨' : '☀️ ☁️';
-
+            
             gameData.garden.forEach((p, i) => {
                 if(p) {
-                    p.w = Math.max(0, p.w - (night ? 0.15 : 0.7));
-                    p.age += 0.1;
-                    if(p.w < 20) p.h -= 0.6;
-                    if(p.age >= 50 || p.h <= 0) gameData.garden[i] = null;
-                    else if(p.h > 40) gameData.score += (FLORA[p.id].inc / 1);
+                    let info = FLORA[p.id];
+                    p.w = Math.max(0, p.w - (night ? 0.2 : 0.9));
+                    p.age += 1; // Возраст идет в секундах
+                    
+                    if(p.w < 20) p.h -= 1.0;
+                    
+                    // Смерть от старости или потери здоровья
+                    if(p.age >= info.life || p.h <= 0) {
+                        gameData.garden[i] = null;
+                        renderGarden();
+                    } else if(p.h > 40) {
+                        gameData.score += info.inc;
+                    }
                 }
             });
             document.getElementById('score').innerText = '💰 ' + Math.floor(gameData.score);
-            save();
-        }, 1000);
+            renderGarden(); save();
+        }
     </script>
 </body>
 </html>
